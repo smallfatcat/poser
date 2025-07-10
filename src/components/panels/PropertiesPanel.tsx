@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
-import styles from './BoneLengthSliders.module.css';
-import { Pose } from '../types';
+import styles from './PropertiesPanel.module.css';
+import { Pose } from '../../types';
 
 interface BoneSliderProps {
     name: string;
@@ -29,12 +29,12 @@ const BoneSlider: React.FC<BoneSliderProps> = memo(({ name, value, onChange, min
     </div>
 ));
 
-interface BoneLengthSlidersProps {
+interface PropertiesPanelProps {
     boneLengths: Pose;
     onBoneLengthChange: (name: string, value: number) => void;
 }
 
-const BoneLengthSliders: React.FC<BoneLengthSlidersProps> = memo(({ boneLengths, onBoneLengthChange }) => {
+const PropertiesPanel: React.FC<PropertiesPanelProps> = memo(({ boneLengths, onBoneLengthChange }) => {
     return (
         <div className={styles.group}>
             <h3 className={styles.groupTitle}>Bone Lengths</h3>
@@ -52,4 +52,4 @@ const BoneLengthSliders: React.FC<BoneLengthSlidersProps> = memo(({ boneLengths,
     );
 });
 
-export default BoneLengthSliders; 
+export default PropertiesPanel; 

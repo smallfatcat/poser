@@ -1,0 +1,19 @@
+.controlSection {
+    margin-bottom: 20px;
+}
+
+.controlRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.numberInput {
+    width: 80px;
+    padding: 5px;
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 4px;
+} 

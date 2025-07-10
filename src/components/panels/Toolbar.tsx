@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
-import styles from './InteractionSettings.module.css';
+import styles from './Toolbar.module.css';
 
-interface InteractionSettingsProps {
+interface ToolbarProps {
     useRelativeConstraints: boolean;
     setUseRelativeConstraints: (value: boolean | ((prev: boolean) => boolean)) => void;
     useInverseKinematics: boolean;
@@ -11,7 +11,7 @@ interface InteractionSettingsProps {
     getJointVisibilityText: () => string;
 }
 
-const InteractionSettings: React.FC<InteractionSettingsProps> = memo(({
+const Toolbar: React.FC<ToolbarProps> = memo(({
     useRelativeConstraints,
     setUseRelativeConstraints,
     useInverseKinematics,
@@ -47,4 +47,4 @@ const InteractionSettings: React.FC<InteractionSettingsProps> = memo(({
     );
 });
 
-export default InteractionSettings; 
+export default Toolbar; 

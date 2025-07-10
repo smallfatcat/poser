@@ -1,12 +1,12 @@
 import React, { memo, useRef } from 'react';
 import styles from './FileOperations.module.css';
 
-interface FileOperationsProps {
+interface FileOperationsPanelProps {
     savePoseData: () => void;
     onPoseLoad: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const FileOperations: React.FC<FileOperationsProps> = memo(({ savePoseData, onPoseLoad }) => {
+const FileOperationsPanel: React.FC<FileOperationsPanelProps> = memo(({ savePoseData, onPoseLoad }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleLoadClick = () => {
@@ -35,4 +35,4 @@ const FileOperations: React.FC<FileOperationsProps> = memo(({ savePoseData, onPo
     );
 });
 
-export default FileOperations; 
+export default FileOperationsPanel; 
