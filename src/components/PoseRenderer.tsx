@@ -87,7 +87,7 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
     // Function to save pose data as JSON file
     const savePoseData = useCallback(() => {
         const poseData = {
-            version: '1.0.0', // __APP_VERSION__ is not defined in this scope
+            version: __APP_VERSION__,
             pose: currentPose,
             timestamp: new Date().toISOString(),
             description: "Saved pose data"
@@ -177,7 +177,7 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
                     style={style}
                 />
                 <div className={styles.version}>
-                    v1.0.0
+                    v{__APP_VERSION__}
                 </div>
             </div>
             {draggable && (
