@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React, { memo, useRef } from 'react';
 import styles from './FileOperations.module.css';
 
-const FileOperations = ({ savePoseData, onPoseLoad }) => {
+const FileOperations = memo(({ savePoseData, onPoseLoad }) => {
     const fileInputRef = useRef(null);
 
     const handleLoadClick = () => {
@@ -28,6 +28,6 @@ const FileOperations = ({ savePoseData, onPoseLoad }) => {
             </div>
         </div>
     );
-};
+});
 
 export default FileOperations; 

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styles from './InteractionSettings.module.css';
 
-const InteractionSettings = ({
+const InteractionSettings = memo(({
     useRelativeConstraints,
     setUseRelativeConstraints,
     useInverseKinematics,
@@ -35,6 +35,6 @@ const InteractionSettings = ({
             </div>
         </div>
     );
-};
+});
 
 export default InteractionSettings; 

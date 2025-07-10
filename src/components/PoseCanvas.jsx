@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import { ikChains } from '../constants/joints';
 import { drawPose, drawJoints } from '../utils/drawing';
 import styles from './PoseRenderer.module.css';
 
-const PoseCanvas = ({
+const PoseCanvas = memo(({
     width,
     height,
     poseCoordinates,
@@ -87,6 +87,6 @@ const PoseCanvas = ({
             style={style}
         />
     );
-};
+});
 
 export default PoseCanvas; 

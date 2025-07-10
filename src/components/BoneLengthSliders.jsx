@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styles from './BoneLengthSliders.module.css';
 
-const BoneSlider = ({ name, value, onChange, min = 10, max = 150 }) => (
+const BoneSlider = memo(({ name, value, onChange, min = 10, max = 150 }) => (
     <div className={styles.sliderContainer}>
         <label htmlFor={`${name}-length`} className={styles.sliderLabel}>
             {name.replace('Length', ' Length')}
@@ -18,9 +18,9 @@ const BoneSlider = ({ name, value, onChange, min = 10, max = 150 }) => (
         />
         <span className={styles.sliderValue}>{value}</span>
     </div>
-);
+));
 
-const BoneLengthSliders = ({ boneLengths, onBoneLengthChange }) => {
+const BoneLengthSliders = memo(({ boneLengths, onBoneLengthChange }) => {
     return (
         <div className={styles.group}>
             <h3 className={styles.groupTitle}>Bone Lengths</h3>
@@ -36,6 +36,6 @@ const BoneLengthSliders = ({ boneLengths, onBoneLengthChange }) => {
             </div>
         </div>
     );
-};
+});
 
 export default BoneLengthSliders; 

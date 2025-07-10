@@ -4,6 +4,7 @@ import { usePoseInteraction } from '../hooks/usePoseInteraction';
 import PoseCanvas from './PoseCanvas';
 import { usePose } from '../context/PoseContext.jsx';
 import styles from './PoseRenderer.module.css';
+import { toast } from 'react-hot-toast';
 
 const PoseRenderer = ({ 
     width = 600, 
@@ -106,11 +107,12 @@ const PoseRenderer = ({
                     if (onPoseChange) {
                         onPoseChange(newPose);
                     }
+                    toast.success('Pose loaded successfully!');
                 } else {
-                    alert('Invalid pose file format. The file should have a "pose" key.');
+                    toast.error('Invalid pose file format. The file should have a "pose" key.');
                 }
             } catch (error) {
-                alert('Error parsing JSON file.');
+                toast.error('Error parsing JSON file.');
             }
         };
         reader.readAsText(file);

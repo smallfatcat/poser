@@ -2,6 +2,7 @@ import React from 'react';
 import PoseRenderer from './components/PoseRenderer';
 import useWindowSize from './hooks/useWindowSize';
 import { PoseProvider } from './context/PoseContext.jsx';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
     const { width, height } = useWindowSize();
@@ -16,6 +17,7 @@ function App() {
     return (
         <PoseProvider>
             <div className="App">
+                <Toaster />
                 <PoseRenderer
                     draggable={true}
                     width={canvasSize}
