@@ -23,6 +23,7 @@ interface PlayheadDisplayProps {
   onPlay: () => void;
   isPlaying: boolean;
   timeDisplayMode: 'seconds' | 'frames';
+  setAnimationDuration: (duration: number) => void;
 }
 
 const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
@@ -38,11 +39,45 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
   onPlay,
   isPlaying,
   timeDisplayMode,
+  setAnimationDuration,
 }) => {
   const [isDraggingPlayhead, setIsDraggingPlayhead] = useState(false);
   const [draggedKeyframeId, setDraggedKeyframeId] = useState<string | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const duration = endTime - startTime;
+
+  const handleTimeChange = (newTime: number) => {
+    onScrub(newTime);
+  };
+
+  const handleDurationChange = (newDuration: number) => {
+    setAnimationDuration(newDuration);
+  };
+
+  const renderTimeInput = (value: number, handler: (value: number) => void) => {
+      const displayValue = timeDisplayMode === 'seconds' ? (value / 1000).toFixed(2) : Math.round(value / (1000 / 60));
+
+      const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+          let newValue = parseFloat(e.target.value);
+          if (isNaN(newValue)) newValue = 0;
+          if (timeDisplayMode === 'seconds') {
+              handler(newValue * 1000);
+          } else {
+              handler(Math.round(newValue * (1000 / 60)));
+          }
+      };
+
+      return (
+          <input
+              type="number"
+              value={displayValue}
+              onChange={handleInputChange}
+              onBlur={(e) => e.target.value = displayValue.toString()}
+              step={timeDisplayMode === 'seconds' ? 0.01 : 1}
+              className={styles.timeInput}
+          />
+      );
+  };
 
   const getPosition = (time: number) => {
     if (duration === 0) return 0;
@@ -66,6 +101,10 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
   };
 
   const handleKeyframeMouseDown = (e: React.MouseEvent<HTMLDivElement>, id: string) => {
+    const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
+    if (id === sortedKeyframes[0]?.id || id === sortedKeyframes[sortedKeyframes.length - 1]?.id) {
+        return; // Prevent dragging first and last keyframes
+    }
     e.stopPropagation();
     setDraggedKeyframeId(id);
   };
@@ -131,7 +170,7 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
             />
             {keyframes.map((keyframe) => {
             const keyframePosition = getPosition(keyframe.time);
-            const poseCoords = poseToCoordinates(keyframe.pose, 0.2);
+            const poseCoords = poseToCoordinates(keyframe.pose, 1);
             return (
                 <div
                 key={keyframe.id}
@@ -141,30 +180,33 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
                 onClick={(e) => {
                     e.stopPropagation();
                     onKeyframeSelect(keyframe.id);
+                    onScrub(keyframe.time);
                 }}
                 >
                     <div className={`${styles.keyframe} ${
                         keyframe.id === selectedKeyframeId ? styles.selected : ''
                     }`} />
                     <div className={styles.thumbnail}>
-                        <PoseCanvas
-                            width={100}
-                            height={100}
-                            poseCoordinates={poseCoords}
-                            strokeColor="#fff"
-                            strokeWidth={1}
-                            headRadius={5}
-                            jointVisibility="never"
-                            draggable={false}
-                            isDragging={false}
-                            useInverseKinematics={false}
-                            draggedJoint={null}
-                            hoveredJoint={null}
-                            excludedJoints={new Set()}
-                            className=""
-                            style={{}}
-                            shouldClear={true}
-                        />
+                        <div className={styles.thumbnailCanvasContainer}>
+                            <PoseCanvas
+                                width={200}
+                                height={134}
+                                poseCoordinates={poseToCoordinates(keyframe.pose, 0.25)}
+                                strokeColor="#fff"
+                                strokeWidth={1}
+                                headRadius={5}
+                                jointVisibility="never"
+                                draggable={false}
+                                isDragging={false}
+                                useInverseKinematics={false}
+                                draggedJoint={null}
+                                hoveredJoint={null}
+                                excludedJoints={new Set()}
+                                className=""
+                                style={{}}
+                                shouldClear={true}
+                            />
+                        </div>
                         <div className={styles.thumbnailTime}>
                             {timeDisplayMode === 'seconds'
                                 ? `${(keyframe.time / 1000).toFixed(2)}s`
@@ -186,6 +228,11 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
             >
                 {isPlaying ? '❚❚' : '▶'}
             </button>
+        </div>
+        <div className={styles.timeDisplay}>
+            {renderTimeInput(currentTime, handleTimeChange)}
+            <span>/</span>
+            {renderTimeInput(duration, handleDurationChange)}
         </div>
     </div>
   );

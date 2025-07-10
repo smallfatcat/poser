@@ -54,10 +54,21 @@ const App: React.FC = () => {
         setAnimationDuration,
     });
 
+    const [useRelativeConstraints, setUseRelativeConstraints] = useState(true);
+    const [useInverseKinematics, setUseInverseKinematics] = useState(true);
+    const [jointVisibility, setJointVisibility] = useState<'always' | 'hover' | 'never'>('hover');
+
+    const keyframeTimes = keyframes.length > 0 ? keyframes.map(k => k.time) : [0];
+    const maxTime = Math.max(...keyframeTimes);
+
+    const startTime = 0;
+    const endTime = Math.max(animationDuration, maxTime);
+
     const handleFrameChange = useCallback((time: number) => {
-        setCurrentTime(time);
-        scrubToTime(time);
-    }, [setCurrentTime, scrubToTime]);
+        const clampedTime = Math.max(startTime, Math.min(time, endTime));
+        setCurrentTime(clampedTime);
+        scrubToTime(clampedTime);
+    }, [setCurrentTime, scrubToTime, endTime]);
 
     const {
         isPlaying,
@@ -74,16 +85,6 @@ const App: React.FC = () => {
         handleFrameChange(time);
         setAnimationTime(time);
     }, [handleFrameChange, setAnimationTime]);
-
-    const [useRelativeConstraints, setUseRelativeConstraints] = useState(true);
-    const [useInverseKinematics, setUseInverseKinematics] = useState(true);
-    const [jointVisibility, setJointVisibility] = useState<'always' | 'hover' | 'never'>('hover');
-
-    const keyframeTimes = keyframes.length > 0 ? keyframes.map(k => k.time) : [0];
-    const maxTime = Math.max(...keyframeTimes);
-
-    const startTime = 0;
-    const endTime = Math.max(animationDuration, maxTime);
 
     const toggleJointVisibility = () => {
         const visibilities: ('always' | 'hover' | 'never')[] = ['hover', 'always', 'never'];
@@ -171,8 +172,6 @@ const App: React.FC = () => {
                         onBoneLengthChange={(name: keyof Pose, value: number) => handleManualPoseChange({ ...currentPose, [name]: value })}
                     />
                     <AnimationPanel
-                        animationDuration={animationDuration}
-                        setAnimationDuration={setAnimationDuration}
                         timeDisplayMode={timeDisplayMode}
                         toggleTimeDisplayMode={toggleTimeDisplayMode}
                         loopMode={loopMode}
@@ -200,13 +199,14 @@ const App: React.FC = () => {
                         onKeyframeSelect={handleSelectKeyframe}
                         onAddKeyframe={() => handleAddKeyframe(currentTime)}
                         currentTime={currentTime}
-                        startTime={startTime}
+                        startTime={0}
                         endTime={endTime}
                         onScrub={handleScrub}
                         onKeyframeTimeChange={handleKeyframeTimeChange}
                         onPlay={handlePlay}
                         isPlaying={isPlaying}
                         timeDisplayMode={timeDisplayMode}
+                        setAnimationDuration={setAnimationDuration}
                     />
                 </Timeline>
             </MainContent>

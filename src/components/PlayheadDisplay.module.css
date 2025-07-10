@@ -74,8 +74,8 @@
     bottom: 25px; /* Position it above the keyframe diamond */
     left: 50%;
     transform: translateX(-50%);
-    width: 100px; /* Larger size on hover */
-    height: 100px;
+    width: 200px;
+    height: 154px; /* 134px for canvas + 20px for time */
     background-color: #2c2c2c;
     border: 1px solid #777;
     border-radius: 4px;
@@ -83,6 +83,12 @@
     transition: visibility 0s, opacity 0.2s linear;
     z-index: 3; /* Ensure it's on top of other elements */
     pointer-events: none; /* Don't let it interfere with mouse events */
+}
+
+.thumbnailCanvasContainer {
+    width: 200px;
+    height: 134px;
+    overflow: hidden;
 }
 
 .keyframeContainer:hover .thumbnail {
@@ -123,4 +129,33 @@
 .buttonGroup {
     display: flex;
     gap: 0px;
+} 
+
+.timeDisplay {
+    background-color: #1e1e1e;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    min-width: 80px;
+    text-align: center;
+    margin-left: 10px;
+}
+
+.timeInput {
+    background-color: transparent;
+    color: inherit;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    text-align: center;
+    width: 60px;
+    -moz-appearance: textfield;
+}
+
+.timeInput::-webkit-outer-spin-button,
+.timeInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 } 

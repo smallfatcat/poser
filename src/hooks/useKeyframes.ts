@@ -96,15 +96,42 @@ export const useKeyframes = ({
     };
 
     const handleAddKeyframe = useCallback((time: number) => {
+        const keyframeAtCurrentTime = keyframes.find(k => Math.abs(k.time - time) < 1);
+
+        if (!keyframeAtCurrentTime) {
+            // No keyframe at the current time, so add one.
+            const newTime = time;
+            if (newTime > animationDuration) {
+                setAnimationDuration(newTime);
+                lastDurationRef.current = newTime;
+            }
+            const newKeyframe: Keyframe = {
+                id: `keyframe_${Date.now()}`,
+                pose: JSON.parse(JSON.stringify(currentPose)),
+                time: newTime,
+            };
+            setKeyframes(prev => [...prev, newKeyframe].sort((a, b) => a.time - b.time));
+            setSelectedKeyframeId(newKeyframe.id);
+            scrubToTime(newTime);
+            toast.success("Keyframe added!");
+            return;
+        }
+        
+        // Keyframe exists at the current time, use old logic based on selection.
         const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
         const selectedIndex = selectedKeyframeId ? sortedKeyframes.findIndex(k => k.id === selectedKeyframeId) : -1;
+
+        if (selectedIndex === -1) {
+            toast.error("Please select a keyframe to add a new one relative to it.");
+            return;
+        }
 
         let newTime: number;
         let didExtendDuration = false;
 
-        if (sortedKeyframes.length === 1 && selectedIndex !== -1) {
+        if (sortedKeyframes.length === 1) {
             newTime = animationDuration;
-        } else if (selectedIndex !== -1) {
+        } else {
             const isLastFrame = selectedIndex === sortedKeyframes.length - 1;
             if (isLastFrame) {
                 newTime = animationDuration + 1000;
@@ -116,8 +143,6 @@ export const useKeyframes = ({
                 const nextKeyframe = sortedKeyframes[selectedIndex + 1];
                 newTime = currentKeyframe.time + (nextKeyframe.time - currentKeyframe.time) / 2;
             }
-        } else {
-            newTime = time;
         }
 
         const keyframeAtNewTime = keyframes.find(k => k.time === newTime);
@@ -133,7 +158,7 @@ export const useKeyframes = ({
 
         const newKeyframe: Keyframe = {
             id: `keyframe_${Date.now()}`,
-            pose: JSON.parse(JSON.stringify(currentPose)), // Deep copy
+            pose: JSON.parse(JSON.stringify(currentPose)),
             time: newTime,
         };
 
