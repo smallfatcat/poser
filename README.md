@@ -1,18 +1,18 @@
-# Poser - A React Pose Application
+# Poser - A React Pose and Animation Application
 
-A React-based pose drawing application that allows for creating and manipulating stick figure poses with interactive controls.
+A React-based application for creating and animating 2D stick figures with a keyframe-based timeline.
 
 ## Features
 
 - 🎨 **Interactive Pose-Drawing Canvas**: A customizable React component for rendering and dragging stick figure poses.
-- 🎛️ **Advanced Pose Controls**: A dedicated control panel for fine-tuning poses.
-- **Inverse Kinematics (IK)**: Enable or disable IK for realistic joint movement.
-- **Relative & Absolute Constraints**: Switch between different constraint modes for dragging.
+- 🎬 **Keyframe Animation**: Create animations by setting poses at different points in time on a timeline.
+- timeline **Timeline & Playback**: A timeline with a playhead, keyframe markers, and playback controls (play, pause, loop).
+- 🎛️ **Advanced Interaction Controls**: A toolbar for fine-tuning interaction settings.
+- **Inverse Kinematics (IK)**: Enable or disable IK for more natural joint movement when dragging.
 - **Adjustable Bone Lengths**: Dynamically change the length of limbs and torso.
-- **Save & Load Poses**: Save your created poses as JSON files and load them back into the editor.
+- **Save & Load**: Save your animations or static poses as JSON files and load them back into the editor.
 - **Joint Visibility Control**: Toggle the visibility of joints for a cleaner look.
-- ⚡ **Performance Optimized**: Uses React hooks for efficient rendering and state management.
--  TypeScript support for the `PoseRenderer` component.
+- ⚡ **Built with TypeScript & Vite**: A modern, fast, and type-safe development environment.
 
 ## Getting Started
 
@@ -37,170 +37,92 @@ To get the application running on your local machine, follow these steps:
 
 ## How to Use
 
-The application consists of two main components: `PoseRenderer` and `PoseControls`.
+The application's UI is divided into several panels:
 
-### `PoseRenderer`
-
-This component renders the stick figure on the canvas. It can be used as a standalone component.
-
-```jsx
-import React, { useState } from 'react';
-import PoseRenderer from './components/PoseRenderer';
-import { initialPose } from './constants/initialPose'; // Assuming you have an initial pose
-
-function MyPoseViewer() {
-    const [pose, setPose] = useState(initialPose);
-
-    const handlePoseChange = (newPose) => {
-        setPose(newPose);
-    };
-
-    return (
-        <PoseRenderer 
-            pose={pose}
-            draggable={true}
-            onPoseChange={handlePoseChange}
-            width={600}
-            height={400}
-        />
-    );
-}
-```
-
-### `PoseControls`
-
-This component provides a UI to control various aspects of the pose and the renderer.
-
-```jsx
-// Example of integrating PoseControls (simplified)
-function PoseEditor() {
-    // ... state management for pose, constraints, IK, etc.
-
-    return (
-        <div>
-            <PoseControls
-                // ... pass props for controls
-            />
-            <PoseRenderer
-                // ... pass props for renderer
-            />
-        </div>
-    );
-}
-```
+*   **Viewport**: The main canvas where the pose is rendered and can be interactively manipulated.
+*   **Timeline**: Below the viewport, this panel shows the animation timeline, keyframes, and playback controls.
+*   **Sidebar**: Contains all the control panels.
+    *   **Toolbar**: Toggles for Inverse Kinematics, Relative Constraints, and Joint Visibility.
+    *   **File Operations**: Buttons to save and load animation or pose files.
+    *   **Properties**: Sliders to adjust the length of each bone in the pose.
+    *   **Animation**: Settings for animation duration, time display (seconds/frames), and loop mode.
 
 ## `PoseRenderer` Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `pose` | `Pose` | **required** | The pose data object. |
+| `onPoseChange`| `(pose: Pose) => void`| **required** | Callback when pose changes during dragging. |
 | `width` | `number` | `600` | Canvas width in pixels. |
 | `height` | `number` | `400` | Canvas height in pixels. |
+| `draggable` | `boolean` | `false` | Enable joint dragging. |
+| `useRelativeConstraints` | `boolean` | `true`| Whether to use relative constraints when dragging. |
+| `useInverseKinematics` | `boolean` | `true` | Whether to use inverse kinematics. |
+| `jointVisibility` | `'always' \| 'hover' \| 'never'` | `'hover'` | Controls when the joint indicators are visible. |
 | `strokeColor` | `string` | `'#00ff00'` | Color of the stick figure. |
 | `strokeWidth` | `number` | `3` | Width of the lines. |
 | `headRadius` | `number` | `15` | Radius of the head circle. |
-| `draggable` | `boolean` | `false` | Enable joint dragging. |
-| `onPoseChange`| `function`| `null` | Callback when pose changes during dragging. |
-| `jointColor` | `string` | `'#ffffff'` | Color of the draggable joint indicators. |
-| `jointRadius`| `number` | `5` | Radius of the joint indicators. |
-| `jointVisibility` | `'always' \| 'hover' \| 'never'` | `'hover'` | Controls when the joint indicators are visible. |
-| `useRelativeConstraints` | `boolean` | `true`| Whether to use relative constraints when dragging. |
-| `useInverseKinematics` | `boolean` | `true` | Whether to use inverse kinematics. |
-| `boneLengths`| `object` | `{...}` | An object containing the lengths of the bones. |
-| `onBoneLengthChange` | `function` | `null` | Callback when bone lengths are changed via controls. |
-| `className` | `string` | `''` | CSS class name for the canvas element. |
-| `style` | `object` | `{}` | Inline styles for the canvas element. |
 
 
-## `PoseControls` Props
+## Data Structure
 
-The `PoseControls` component offers a user interface for manipulating the pose and its properties.
+The application can save and load animations or single poses as JSON files.
 
-| Prop | Description |
-|------|-------------|
-| `draggable` | Determines if interaction settings are shown. |
-| `useRelativeConstraints` | State for the relative constraints toggle. |
-| `setUseRelativeConstraints`| Function to toggle relative constraints. |
-| `useInverseKinematics` | State for the IK toggle. |
-| `setUseInverseKinematics`| Function to toggle IK. |
-| `jointVisibility` | Current joint visibility mode. |
-| `toggleJointVisibility`| Function to cycle through visibility modes. |
-| `getJointVisibilityText`| Function that returns the text for the visibility button. |
-| `savePoseData` | Function to trigger saving the current pose. |
-| `onPoseLoad` | Function to handle loading a pose from a file. |
-| `boneLengths` | An object with the current bone lengths for the sliders. |
-| `onBoneLengthChange` | Function to handle changes from the bone length sliders. |
-
-
-## Pose Data Structure
-
-The application can save and load poses as JSON files. The exported file has the following structure:
+### Animation File Structure
 
 ```json
 {
-  "version": "1.1.1",
-  "pose": {
-    "hip": { "x": 300, "y": 218 },
-    "torsoLength": 80,
-    "torsoAngle": 90,
-    "neckLength": 20,
-    "neckAngle": 90,
-    "headAngle": 90,
-    "upperArmLength": 60,
-    "lowerArmLength": 55,
-    "handLength": 25,
-    "leftUpperArmAngle": 225,
-    "leftLowerArmAngle": 225,
-    "leftHandAngle": 225,
-    "rightUpperArmAngle": 315,
-    "rightLowerArmAngle": 315,
-    "rightHandAngle": 315,
-    "upperLegLength": 70,
-    "lowerLegLength": 65,
-    "footLength": 30,
-    "leftUpperLegAngle": 225,
-    "leftLowerLegAngle": 225,
-    "leftFootAngle": 225,
-    "rightUpperLegAngle": 315,
-    "rightLowerLegAngle": 315,
-    "rightFootAngle": 315
-  },
-  "timestamp": "2023-12-25T12:00:00.000Z",
-  "description": "Saved pose data"
+  "version": "1.3.0",
+  "animationDuration": 5000,
+  "keyframes": [
+    {
+      "id": "keyframe_1672000000000",
+      "pose": {
+        "hip": { "x": 300, "y": 218 },
+        "torsoLength": 80,
+        // ... other pose properties
+      },
+      "time": 0
+    },
+    {
+      "id": "keyframe_1672000005000",
+      "pose": {
+        "hip": { "x": 350, "y": 218 },
+        "torsoLength": 80,
+        // ... other pose properties
+      },
+      "time": 5000
+    }
+  ]
+}
+```
+
+### Pose File Structure
+
+If the file contains only a single pose (not an animation), it will have a simpler structure:
+
+```json
+{
+    "pose": {
+        "hip": { "x": 300, "y": 218 },
+        "torsoLength": 80,
+        // ... other pose properties
+    }
 }
 ```
 
 The `pose` object itself contains a mix of coordinates, angles, and lengths:
 -   `hip`: The `(x, y)` coordinates for the base position of the pose.
--   `...Length`: The length of each body part in pixels. These are adjustable via the "Bone Lengths" controls.
+-   `...Length`: The length of each body part in pixels. These are adjustable via the "Properties" panel.
 -   `...Angle`: The angle of each joint in degrees, relative to its parent.
 
-This structure allows for a flexible and detailed representation of the pose.
+This structure allows for a flexible and detailed representation of the pose and animations.
 
-## TypeScript Support
+## TypeScript
 
-While the main application is written in JavaScript, the `PoseRenderer` component is fully typed and can be imported into a TypeScript project. A `PoseRenderer.d.ts` file is included.
-
-```typescript
-import PoseRenderer, { Pose } from './components/PoseRenderer';
-
-const myPose: Pose = {
-    head: { x: 300, y: 100 },
-    // ... rest of pose data
-};
-
-const handlePoseChange = (newPose: Pose) => {
-    console.log('Pose changed:', newPose);
-};
-```
+The entire application is built with TypeScript. All components and data structures are fully typed.
 
 ## Browser Support
 
 - Chrome 60+
-- Firefox 55+
-- Safari 12+
-- Edge 79+
-
-## License
-
-MIT License 
+- Firefox 55+ 

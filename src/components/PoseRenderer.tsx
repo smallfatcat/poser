@@ -1,5 +1,4 @@
 import React, { useRef, useCallback, useState } from 'react';
-import PoseControls from './PoseControls';
 import { usePoseInteraction } from '../hooks/usePoseInteraction';
 import PoseCanvas from './PoseCanvas';
 import { usePose } from '../context/PoseContext';

@@ -1,5 +1,6 @@
 import React, { memo, useRef } from 'react';
-import styles from './FileOperations.module.css';
+import styles from './FileOperationsPanel.module.css';
+import { toast } from 'react-hot-toast';
 
 interface FileOperationsPanelProps {
     onSave: () => void;
