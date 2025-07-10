@@ -1,15 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PoseRenderer from './components/PoseRenderer';
-import { createDynamicActionPose } from './utils/poseInterpolation';
 import useWindowSize from './hooks/useWindowSize';
+import { PoseProvider } from './context/PoseContext.jsx';
 
 function App() {
-    const [currentPose, setCurrentPose] = useState(createDynamicActionPose());
     const { width, height } = useWindowSize();
-
-    const handlePoseChange = (newPose) => {
-        setCurrentPose(newPose);
-    };
 
     if (!width || !height) {
         return <div>Loading...</div>;
@@ -19,15 +14,15 @@ function App() {
 
 
     return (
-        <div className="App">
-            <PoseRenderer
-                pose={currentPose}
-                draggable={true}
-                onPoseChange={handlePoseChange}
-                width={canvasSize}
-                height={canvasSize * 0.67}
-            />
-        </div>
+        <PoseProvider>
+            <div className="App">
+                <PoseRenderer
+                    draggable={true}
+                    width={canvasSize}
+                    height={canvasSize * 0.67}
+                />
+            </div>
+        </PoseProvider>
     );
 }
 

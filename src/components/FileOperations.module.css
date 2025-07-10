@@ -1,0 +1,37 @@
+.group {
+    margin-bottom: 20px;
+}
+
+.groupTitle {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #e0e0e0;
+    border-bottom: 1px solid #555;
+    padding-bottom: 8px;
+}
+
+.button {
+    padding: 10px 18px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    outline: none;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.saveButton {
+    background-color: #198754;
+}
+
+.loadButton {
+    background-color: #0dcaf0;
+}
+
+.buttonContainer {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+} 
