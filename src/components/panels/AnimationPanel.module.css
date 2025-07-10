@@ -16,4 +16,15 @@
     color: #fff;
     border: 1px solid #555;
     border-radius: 4px;
+}
+
+.toggleButton {
+    padding: 5px 10px;
+    background-color: #555;
+    color: #fff;
+    border: 1px solid #777;
+    border-radius: 4px;
+    cursor: pointer;
+    min-width: 80px;
+    text-align: center;
 } 

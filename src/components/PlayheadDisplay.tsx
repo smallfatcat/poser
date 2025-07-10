@@ -23,6 +23,7 @@ interface PlayheadDisplayProps {
   onKeyframeTimeChange: (id: string, time: number) => void;
   onPlay: () => void;
   isPlaying: boolean;
+  timeDisplayMode: 'seconds' | 'frames';
 }
 
 const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
@@ -37,6 +38,7 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
   onKeyframeTimeChange,
   onPlay,
   isPlaying,
+  timeDisplayMode,
 }) => {
   const [isDraggingPlayhead, setIsDraggingPlayhead] = useState(false);
   const [draggedKeyframeId, setDraggedKeyframeId] = useState<string | null>(null);
@@ -147,8 +149,8 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
                     }`} />
                     <div className={styles.thumbnail}>
                         <PoseCanvas
-                            width={80}
-                            height={80}
+                            width={100}
+                            height={100}
                             poseCoordinates={poseCoords}
                             strokeColor="#fff"
                             strokeWidth={1}
@@ -164,6 +166,11 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
                             style={{}}
                             shouldClear={true}
                         />
+                        <div className={styles.thumbnailTime}>
+                            {timeDisplayMode === 'seconds'
+                                ? `${(keyframe.time / 1000).toFixed(2)}s`
+                                : `${Math.round(keyframe.time / (1000 / 60))}f`}
+                        </div>
                     </div>
                 </div>
             );

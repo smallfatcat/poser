@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import { Keyframe } from '../components/PlayheadDisplay';
 import { Pose } from '../types';
@@ -17,6 +17,19 @@ export const useKeyframes = ({
     const { currentPose, setPose } = usePose();
     const [keyframes, setKeyframes] = useState<Keyframe[]>([]);
     const [selectedKeyframeId, setSelectedKeyframeId] = useState<string | undefined>(undefined);
+    const lastDurationRef = useRef(animationDuration);
+
+    useEffect(() => {
+        if (lastDurationRef.current !== animationDuration && lastDurationRef.current > 0) {
+            const ratio = animationDuration / lastDurationRef.current;
+            const updatedKeyframes = keyframes.map(kf => ({
+                ...kf,
+                time: Math.round(kf.time * ratio)
+            }));
+            setKeyframes(updatedKeyframes);
+        }
+        lastDurationRef.current = animationDuration;
+    }, [animationDuration]);
 
     useEffect(() => {
         if (keyframes.length === 0 && currentPose) {
@@ -67,6 +80,18 @@ export const useKeyframes = ({
         const updatedKeyframes = keyframes.map(k =>
             k.id === id ? { ...k, time } : k
         );
+
+        const sortedNewKeyframes = [...updatedKeyframes].sort((a, b) => a.time - b.time);
+        const newLastTime = sortedNewKeyframes[sortedNewKeyframes.length - 1].time;
+        
+        const sortedOldKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
+        const oldLastKeyframe = sortedOldKeyframes[sortedOldKeyframes.length - 1];
+
+        if ((oldLastKeyframe && oldLastKeyframe.id === id) || newLastTime > animationDuration) {
+            setAnimationDuration(newLastTime);
+            lastDurationRef.current = newLastTime;
+        }
+
         setKeyframes(updatedKeyframes);
         scrubToTime(time);
     };
@@ -76,6 +101,7 @@ export const useKeyframes = ({
         const selectedIndex = selectedKeyframeId ? sortedKeyframes.findIndex(k => k.id === selectedKeyframeId) : -1;
 
         let newTime: number;
+        let didExtendDuration = false;
 
         if (sortedKeyframes.length === 1 && selectedIndex !== -1) {
             newTime = animationDuration;
@@ -84,6 +110,8 @@ export const useKeyframes = ({
             if (isLastFrame) {
                 newTime = animationDuration + 1000;
                 setAnimationDuration(newTime);
+                lastDurationRef.current = newTime;
+                didExtendDuration = true;
             } else {
                 const currentKeyframe = sortedKeyframes[selectedIndex];
                 const nextKeyframe = sortedKeyframes[selectedIndex + 1];
@@ -97,6 +125,11 @@ export const useKeyframes = ({
         if (keyframeAtNewTime) {
             toast.error("A keyframe already exists at the calculated time. Please adjust.");
             return;
+        }
+
+        if (!didExtendDuration && newTime > animationDuration) {
+            setAnimationDuration(newTime);
+            lastDurationRef.current = newTime;
         }
 
         const newKeyframe: Keyframe = {

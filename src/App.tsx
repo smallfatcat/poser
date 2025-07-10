@@ -23,6 +23,11 @@ const App: React.FC = () => {
     const { currentPose, setPose } = usePose();
     const [animationDuration, setAnimationDuration] = useState(5000);
     const [currentTime, setCurrentTime] = useState(0);
+    const [timeDisplayMode, setTimeDisplayMode] = useState<'seconds' | 'frames'>('seconds');
+
+    const toggleTimeDisplayMode = () => {
+        setTimeDisplayMode(prev => prev === 'seconds' ? 'frames' : 'seconds');
+    };
 
     const {
         keyframes,
@@ -128,6 +133,8 @@ const App: React.FC = () => {
                     <AnimationPanel
                         animationDuration={animationDuration}
                         setAnimationDuration={setAnimationDuration}
+                        timeDisplayMode={timeDisplayMode}
+                        toggleTimeDisplayMode={toggleTimeDisplayMode}
                     />
                 </InspectorPanel>
             </Sidebar>
@@ -157,6 +164,7 @@ const App: React.FC = () => {
                         onKeyframeTimeChange={handleKeyframeTimeChange}
                         onPlay={handlePlay}
                         isPlaying={isPlaying}
+                        timeDisplayMode={timeDisplayMode}
                     />
                 </Timeline>
             </MainContent>
