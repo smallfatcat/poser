@@ -1,7 +1,9 @@
+import { PoseCoordinates, DrawConfig, StyleConfig } from "../types";
+
 // Draw joint points
 export const drawJoints = (
-    ctx, 
-    poseCoordinates, 
+    ctx: CanvasRenderingContext2D, 
+    poseCoordinates: PoseCoordinates, 
     { 
         draggable, 
         isDragging, 
@@ -11,13 +13,13 @@ export const drawJoints = (
         excludedJoints, 
         ikChains, 
         jointVisibility 
-    }
+    }: DrawConfig
 ) => {
     if (!draggable) return;
 
-    let activeIkChain = [];
-    if (isDragging && useInverseKinematics) {
-        let chain = null;
+    let activeIkChain: string[] = [];
+    if (isDragging && useInverseKinematics && draggedJoint) {
+        let chain: string[] | undefined = undefined;
         if (draggedJoint === 'head') {
             chain = ikChains.head;
         } else if (["leftHand", "leftUpperArm", "leftLowerArm"].includes(draggedJoint)) {
@@ -70,8 +72,8 @@ export const drawJoints = (
 };
 
 export const drawPose = (
-    ctx, 
-    poseData, 
+    ctx: CanvasRenderingContext2D, 
+    poseData: PoseCoordinates, 
     { 
         strokeColor, 
         strokeWidth, 
@@ -80,8 +82,8 @@ export const drawPose = (
         drawJoints,
         width,
         height
-    },
-    drawConfig
+    }: StyleConfig,
+    drawConfig: DrawConfig
 ) => {
     if (!ctx) return;
 

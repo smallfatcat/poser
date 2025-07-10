@@ -1,11 +1,16 @@
 import React, { memo, useRef } from 'react';
 import styles from './FileOperations.module.css';
 
-const FileOperations = memo(({ savePoseData, onPoseLoad }) => {
-    const fileInputRef = useRef(null);
+interface FileOperationsProps {
+    savePoseData: () => void;
+    onPoseLoad: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const FileOperations: React.FC<FileOperationsProps> = memo(({ savePoseData, onPoseLoad }) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleLoadClick = () => {
-        fileInputRef.current.click();
+        fileInputRef.current?.click();
     };
 
     return (

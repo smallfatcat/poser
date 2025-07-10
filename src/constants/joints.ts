@@ -1,4 +1,10 @@
-export const jointHierarchy = {
+interface JointInfo {
+    parent: string;
+    angleParam: string;
+    needsOffset: boolean;
+}
+
+export const jointHierarchy: { [key: string]: JointInfo } = {
     'head': { parent: 'shoulder', angleParam: 'headAngle', needsOffset: true },
     'neck': { parent: 'shoulder', angleParam: 'headAngle', needsOffset: true },
     'shoulder': { parent: 'hip', angleParam: 'torsoAngle', needsOffset: true },

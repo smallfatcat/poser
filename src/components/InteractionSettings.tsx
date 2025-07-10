@@ -1,7 +1,17 @@
 import React, { memo } from 'react';
 import styles from './InteractionSettings.module.css';
 
-const InteractionSettings = memo(({
+interface InteractionSettingsProps {
+    useRelativeConstraints: boolean;
+    setUseRelativeConstraints: (value: boolean | ((prev: boolean) => boolean)) => void;
+    useInverseKinematics: boolean;
+    setUseInverseKinematics: (value: boolean | ((prev: boolean) => boolean)) => void;
+    jointVisibility: 'always' | 'hover' | 'never';
+    toggleJointVisibility: () => void;
+    getJointVisibilityText: () => string;
+}
+
+const InteractionSettings: React.FC<InteractionSettingsProps> = memo(({
     useRelativeConstraints,
     setUseRelativeConstraints,
     useInverseKinematics,

@@ -1,9 +1,28 @@
-import React, { useEffect, useRef, memo } from 'react';
+import React, { useEffect, useRef, forwardRef, memo } from 'react';
 import { ikChains } from '../constants/joints';
 import { drawPose, drawJoints } from '../utils/drawing';
 import styles from './PoseRenderer.module.css';
+import { PoseCoordinates, DrawConfig, StyleConfig } from '../types';
 
-const PoseCanvas = memo(({
+interface PoseCanvasProps {
+    width: number;
+    height: number;
+    poseCoordinates: PoseCoordinates;
+    strokeColor: string;
+    strokeWidth: number;
+    headRadius: number;
+    jointVisibility: 'always' | 'hover' | 'never';
+    draggable: boolean;
+    isDragging: boolean;
+    useInverseKinematics: boolean;
+    draggedJoint: string | null;
+    hoveredJoint: string | null;
+    excludedJoints: Set<string>;
+    className: string;
+    style: React.CSSProperties;
+}
+
+const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
     width,
     height,
     poseCoordinates,
@@ -19,21 +38,20 @@ const PoseCanvas = memo(({
     excludedJoints,
     className,
     style,
-    canvasRef,
-}) => {
-    const ctxRef = useRef(null);
+}, ref) => {
+    const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
     useEffect(() => {
-        const canvas = canvasRef.current;
+        const canvas = (ref as React.RefObject<HTMLCanvasElement>)?.current;
         if (canvas) {
             ctxRef.current = canvas.getContext('2d');
         }
-    }, [canvasRef]);
+    }, [ref]);
 
     useEffect(() => {
         const ctx = ctxRef.current;
         if (ctx && poseCoordinates) {
-            const drawConfig = {
+            const drawConfig: DrawConfig = {
                 draggable,
                 isDragging,
                 useInverseKinematics,
@@ -43,7 +61,7 @@ const PoseCanvas = memo(({
                 ikChains,
                 jointVisibility
             };
-            const styleConfig = {
+            const styleConfig: StyleConfig = {
                 strokeColor,
                 strokeWidth,
                 headRadius,
@@ -65,7 +83,7 @@ const PoseCanvas = memo(({
         useInverseKinematics, 
         draggedJoint, 
         hoveredJoint, 
-        excludedJoints, 
+        excludedJoints,
         ikChains,
         width,
         height,
@@ -80,7 +98,7 @@ const PoseCanvas = memo(({
 
     return (
         <canvas
-            ref={canvasRef}
+            ref={ref}
             width={width}
             height={height}
             className={canvasClasses}
@@ -89,4 +107,4 @@ const PoseCanvas = memo(({
     );
 });
 
-export default PoseCanvas; 
+export default memo(PoseCanvasComponent); 

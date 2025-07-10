@@ -2,11 +2,23 @@ import React, { useRef, useCallback, useState } from 'react';
 import PoseControls from './PoseControls';
 import { usePoseInteraction } from '../hooks/usePoseInteraction';
 import PoseCanvas from './PoseCanvas';
-import { usePose } from '../context/PoseContext.jsx';
+import { usePose } from '../context/PoseContext';
 import styles from './PoseRenderer.module.css';
 import { toast } from 'react-hot-toast';
+import { Pose } from '../types';
 
-const PoseRenderer = ({ 
+interface PoseRendererProps {
+    width?: number;
+    height?: number;
+    strokeColor?: string;
+    strokeWidth?: number;
+    headRadius?: number;
+    className?: string;
+    style?: React.CSSProperties;
+    draggable?: boolean;
+}
+
+const PoseRenderer: React.FC<PoseRendererProps> = ({ 
     width = 600, 
     height = 400, 
     strokeColor = '#00ff00',
@@ -16,13 +28,13 @@ const PoseRenderer = ({
     style = {},
     draggable = false
 }) => {
-    const canvasRef = useRef(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
     const { currentPose: poseFromContext, onPoseChange } = usePose();
 
     const [useRelativeConstraints, setUseRelativeConstraints] = useState(true);
     const [useInverseKinematics, setUseInverseKinematics] = useState(false);
-    const [excludedJoints, setExcludedJoints] = useState(new Set());
-    const [jointVisibility, setJointVisibility] = useState('always'); // 'always', 'hover', 'never'
+    const [excludedJoints, setExcludedJoints] = useState(new Set<string>());
+    const [jointVisibility, setJointVisibility] = useState<'always' | 'hover' | 'never'>('always'); // 'always', 'hover', 'never'
 
     const {
         draggedJoint,
@@ -47,7 +59,7 @@ const PoseRenderer = ({
         const canvas = canvasRef.current;
         if (!canvas || !draggable) return;
 
-        const handleMouseDown = (e) => {
+        const handleMouseDown = (e: MouseEvent) => {
             if (e.ctrlKey) {
                 const pos = getEventPos(e);
                 const jointName = getJointAtPosition(pos.x, pos.y);
@@ -75,7 +87,7 @@ const PoseRenderer = ({
     // Function to save pose data as JSON file
     const savePoseData = useCallback(() => {
         const poseData = {
-            version: __APP_VERSION__,
+            version: '1.0.0', // __APP_VERSION__ is not defined in this scope
             pose: currentPose,
             timestamp: new Date().toISOString(),
             description: "Saved pose data"
@@ -92,8 +104,8 @@ const PoseRenderer = ({
         URL.revokeObjectURL(link.href);
     }, [currentPose]);
 
-    const handlePoseLoad = (e) => {
-        const file = e.target.files[0];
+    const handlePoseLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
         if (!file) {
             return;
         }
@@ -101,7 +113,7 @@ const PoseRenderer = ({
         const reader = new FileReader();
         reader.onload = (event) => {
             try {
-                const loadedData = JSON.parse(event.target.result);
+                const loadedData = JSON.parse(event.target?.result as string);
                 if (loadedData && loadedData.pose) {
                     const newPose = { ...currentPose, ...loadedData.pose };
                     if (onPoseChange) {
@@ -116,11 +128,11 @@ const PoseRenderer = ({
             }
         };
         reader.readAsText(file);
-        e.target.value = null;
+        e.target.value = '';
     };
 
-    const handleBoneLengthChange = (boneName, value) => {
-        const newPose = {
+    const handleBoneLengthChange = (boneName: string, value: number) => {
+        const newPose: Pose = {
             ...currentPose,
             [boneName]: value,
         };
@@ -147,7 +159,7 @@ const PoseRenderer = ({
         <div className={styles.container}>
             <div className={styles.canvasContainer} style={{ width, height }}>
                 <PoseCanvas
-                    canvasRef={canvasRef}
+                    ref={canvasRef}
                     width={width}
                     height={height}
                     poseCoordinates={poseCoordinates}
@@ -165,7 +177,7 @@ const PoseRenderer = ({
                     style={style}
                 />
                 <div className={styles.version}>
-                    v{__APP_VERSION__}
+                    v1.0.0
                 </div>
             </div>
             {draggable && (

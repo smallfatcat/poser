@@ -1,19 +1,23 @@
+import { Pose, Vector2 } from "../types";
+
 // Utility functions for pose interpolation and animation
 
 // Interpolate between two numbers
-export const interpolate = (start, end, t) => {
+export const interpolate = (start: number, end: number, t: number): number => {
     return start + (end - start) * t;
 };
 
 // Interpolate between two poses
-export const interpolatePose = (poseA, poseB, t) => {
-    const interpolatedPose = {};
+export const interpolatePose = (poseA: Pose, poseB: Pose, t: number): Pose => {
+    const interpolatedPose: Pose = {};
     
     // Interpolate hip position
-    interpolatedPose.hip = {
-        x: interpolate(poseA.hip.x, poseB.hip.x, t),
-        y: interpolate(poseA.hip.y, poseB.hip.y, t)
-    };
+    if (typeof poseA.hip === 'object' && typeof poseB.hip === 'object') {
+        interpolatedPose.hip = {
+            x: interpolate(poseA.hip.x, poseB.hip.x, t),
+            y: interpolate(poseA.hip.y, poseB.hip.y, t)
+        };
+    }
     
     // Interpolate all angles
     const angleProps = [
@@ -25,7 +29,9 @@ export const interpolatePose = (poseA, poseB, t) => {
     ];
     
     angleProps.forEach(prop => {
-        interpolatedPose[prop] = interpolate(poseA[prop], poseB[prop], t);
+        if (typeof poseA[prop] === 'number' && typeof poseB[prop] === 'number') {
+            interpolatedPose[prop] = interpolate(poseA[prop] as number, poseB[prop] as number, t);
+        }
     });
     
     // Interpolate segment lengths
@@ -35,14 +41,16 @@ export const interpolatePose = (poseA, poseB, t) => {
     ];
     
     lengthProps.forEach(prop => {
-        interpolatedPose[prop] = interpolate(poseA[prop], poseB[prop], t);
+        if (typeof poseA[prop] === 'number' && typeof poseB[prop] === 'number') {
+            interpolatedPose[prop] = interpolate(poseA[prop] as number, poseB[prop] as number, t);
+        }
     });
     
     return interpolatedPose;
 };
 
 // Create a pose preset (standing pose)
-export const createStandingPose = (hipX = 300, hipY = 200) => ({
+export const createStandingPose = (hipX = 300, hipY = 200): Pose => ({
     hip: { x: hipX, y: hipY },
     torsoAngle: 0,
     headAngle: 0,
@@ -71,7 +79,7 @@ export const createStandingPose = (hipX = 300, hipY = 200) => ({
 });
 
 // Create a pose preset (walking pose)
-export const createWalkingPose = (hipX = 300, hipY = 200) => ({
+export const createWalkingPose = (hipX = 300, hipY = 200): Pose => ({
     hip: { x: hipX, y: hipY },
     torsoAngle: 5,
     headAngle: -5,
@@ -100,7 +108,7 @@ export const createWalkingPose = (hipX = 300, hipY = 200) => ({
 });
 
 // Create a dynamic action pose based on the user's image reference
-export const createDynamicActionPose = (hipX = 300, hipY = 220) => ({
+export const createDynamicActionPose = (hipX = 300, hipY = 220): Pose => ({
     hip: { x: hipX, y: hipY },
     torsoAngle: 354.39095320527827,
     headAngle: 352.87072944940746,
@@ -129,7 +137,7 @@ export const createDynamicActionPose = (hipX = 300, hipY = 220) => ({
 });
 
 // Create a pose preset (sitting pose)
-export const createSittingPose = (hipX = 300, hipY = 280) => ({
+export const createSittingPose = (hipX = 300, hipY = 280): Pose => ({
     hip: { x: hipX, y: hipY },
     torsoAngle: 0,
     headAngle: 0,
@@ -158,7 +166,7 @@ export const createSittingPose = (hipX = 300, hipY = 280) => ({
 });
 
 // Easing functions for smooth animations
-export const easing = {
+export const easing: { [key: string]: (t: number) => number } = {
     linear: t => t,
     easeInQuad: t => t * t,
     easeOutQuad: t => t * (2 - t),

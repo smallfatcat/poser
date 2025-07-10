@@ -1,8 +1,10 @@
+import { Pose, PoseCoordinates, Vector2 } from "../types";
+
 // Helper function to convert angle to radians
-export const toRadians = (degrees) => degrees * (Math.PI / 180);
+export const toRadians = (degrees: number): number => degrees * (Math.PI / 180);
 
 // Helper function to calculate point from origin, angle, and distance
-export const calculatePoint = (originX, originY, angleDegrees, distance) => {
+export const calculatePoint = (originX: number, originY: number, angleDegrees: number, distance: number): Vector2 => {
     const angleRadians = toRadians(angleDegrees);
     return {
         x: originX + distance * Math.cos(angleRadians),
@@ -11,7 +13,7 @@ export const calculatePoint = (originX, originY, angleDegrees, distance) => {
 };
 
 // Function to convert angle-based pose to coordinate-based pose
-export const poseToCoordinates = (pose) => {
+export const poseToCoordinates = (pose: Pose): PoseCoordinates => {
     const {
         hip,
         torsoAngle,
@@ -39,6 +41,10 @@ export const poseToCoordinates = (pose) => {
         lowerLegLength,
         footLength
     } = pose;
+
+    if (typeof hip !== 'object' || typeof torsoAngle !== 'number' || typeof headAngle !== 'number' || typeof neckLength !== 'number' || typeof headRadius !== 'number' || typeof leftUpperArmAngle !== 'number' || typeof leftLowerArmAngle !== 'number' || typeof leftHandAngle !== 'number' || typeof rightUpperArmAngle !== 'number' || typeof rightLowerArmAngle !== 'number' || typeof rightHandAngle !== 'number' || typeof leftUpperLegAngle !== 'number' || typeof leftLowerLegAngle !== 'number' || typeof leftFootAngle !== 'number' || typeof rightUpperLegAngle !== 'number' || typeof rightLowerLegAngle !== 'number' || typeof rightFootAngle !== 'number' || typeof upperArmLength !== 'number' || typeof lowerArmLength !== 'number' || typeof handLength !== 'number' || typeof torsoLength !== 'number' || typeof upperLegLength !== 'number' || typeof lowerLegLength !== 'number' || typeof footLength !== 'number') {
+        throw new Error("Invalid pose object");
+    }
 
     // Calculate shoulder position (torso goes up from hip)
     const shoulder = calculatePoint(hip.x, hip.y, 90 + torsoAngle, torsoLength);

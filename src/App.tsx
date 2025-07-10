@@ -1,10 +1,10 @@
 import React from 'react';
 import PoseRenderer from './components/PoseRenderer';
 import useWindowSize from './hooks/useWindowSize';
-import { PoseProvider } from './context/PoseContext.jsx';
+import { PoseProvider } from './context/PoseContext';
 import { Toaster } from 'react-hot-toast';
 
-function App() {
+const App: React.FC = () => {
     const { width, height } = useWindowSize();
 
     if (!width || !height) {
