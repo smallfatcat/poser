@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './AnimationPanel.module.css';
 
 type LoopMode = 'none' | 'loop' | 'pingPong';
 
@@ -49,9 +48,9 @@ const AnimationPanel: React.FC<AnimationPanelProps> = ({
     };
 
     return (
-        <div className={styles.controlSection}>
-            <h4>Animation</h4>
-            <div className={styles.controlRow}>
+        <div className="group">
+            <h3 className="group-title">Animation</h3>
+            <div className="control-row">
                 <label htmlFor="duration">
                     Duration ({timeDisplayMode === 'seconds' ? 's' : 'frames'})
                 </label>
@@ -61,18 +60,18 @@ const AnimationPanel: React.FC<AnimationPanelProps> = ({
                     value={getDisplayDuration()}
                     onChange={handleDurationChange}
                     step={timeDisplayMode === 'seconds' ? 0.1 : 1}
-                    className={styles.numberInput}
+                    className="number-input"
                 />
             </div>
-            <div className={styles.controlRow}>
+            <div className="control-row">
                 <label>Time Display</label>
-                <button onClick={toggleTimeDisplayMode} className={styles.toggleButton}>
+                <button onClick={toggleTimeDisplayMode} className="btn">
                     {timeDisplayMode === 'seconds' ? 'Seconds' : 'Frames'}
                 </button>
             </div>
-            <div className={styles.controlRow}>
+            <div className="control-row">
                 <label>Loop</label>
-                <button onClick={toggleLoopMode} className={styles.toggleButton}>
+                <button onClick={toggleLoopMode} className="btn">
                     {getLoopButtonText()}
                 </button>
             </div>

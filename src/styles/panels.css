@@ -1,0 +1,38 @@
+.group {
+    margin-bottom: 20px;
+}
+
+.group-title {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #e0e0e0;
+    border-bottom: 1px solid #555;
+    padding-bottom: 8px;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.control-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.number-input {
+    width: 80px;
+    padding: 5px;
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+.control-row label {
+    color: #e0e0e0;
+    font-size: 14px;
+} 

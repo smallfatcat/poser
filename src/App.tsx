@@ -94,9 +94,9 @@ const App: React.FC = () => {
 
     const getJointVisibilityText = () => {
         switch (jointVisibility) {
-            case 'hover': return 'Visible on Hover';
-            case 'always': return 'Always Visible';
-            case 'never': return 'Never Visible';
+            case 'hover': return 'Joints: Hover';
+            case 'always': return 'Joints: Always';
+            case 'never': return 'Joints: Never';
         }
     };
 

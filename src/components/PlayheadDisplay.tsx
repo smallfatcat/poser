@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './PlayheadDisplay.module.css';
-import buttonStyles from './Button.module.css';
 import { Pose } from '../types';
 import PoseCanvas from './PoseCanvas';
 import { poseToCoordinates } from '../utils/poseAngleToCoordinates';
@@ -177,13 +176,13 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
             })}
         </div>
         <div className={styles.buttonGroup}>
-            <button 
-                onClick={onAddKeyframe} 
-                className={`${buttonStyles.button} ${buttonStyles.addButton}`}
+            <button
+                onClick={onAddKeyframe}
+                className="btn btn-icon"
             >+</button>
             <button
                 onClick={onPlay}
-                className={`${buttonStyles.button} ${buttonStyles.playButton}`}
+                className="btn btn-icon"
             >
                 {isPlaying ? '❚❚' : '▶'}
             </button>

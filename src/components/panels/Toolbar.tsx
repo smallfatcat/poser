@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import styles from './Toolbar.module.css';
 
 interface ToolbarProps {
     useRelativeConstraints: boolean;
@@ -21,24 +20,24 @@ const Toolbar: React.FC<ToolbarProps> = memo(({
     getJointVisibilityText,
 }) => {
     return (
-        <div className={styles.group}>
-            <h3 className={styles.groupTitle}>Interaction Settings</h3>
-            <div className={styles.buttonContainer}>
-                <button 
-                    onClick={() => setUseRelativeConstraints(!useRelativeConstraints)} 
-                    className={`${styles.button} ${styles.relativeConstraintsButton} ${useRelativeConstraints ? styles.active : ''}`}
+        <div className="group">
+            <h3 className="group-title">Interaction Settings</h3>
+            <div className="button-container">
+                <button
+                    onClick={() => setUseRelativeConstraints(!useRelativeConstraints)}
+                    className={`btn ${useRelativeConstraints ? 'active' : ''}`}
                 >
-                    {useRelativeConstraints ? 'Relative Constraints' : 'Absolute Constraints'}
+                    {useRelativeConstraints ? 'Constraints: Rel' : 'Constraints: Abs'}
                 </button>
-                <button 
-                    onClick={() => setUseInverseKinematics(!useInverseKinematics)} 
-                    className={`${styles.button} ${styles.ikButton} ${useInverseKinematics ? styles.active : ''}`}
+                <button
+                    onClick={() => setUseInverseKinematics(!useInverseKinematics)}
+                    className={`btn ${useInverseKinematics ? 'active' : ''}`}
                 >
-                    {useInverseKinematics ? 'IK Enabled' : 'IK Disabled'}
+                    {useInverseKinematics ? 'IK: On' : 'IK: Off'}
                 </button>
-                <button 
-                    onClick={toggleJointVisibility} 
-                    className={`${styles.button} ${styles.visibilityButton} ${styles[jointVisibility]}`}
+                <button
+                    onClick={toggleJointVisibility}
+                    className="btn"
                 >
                     {getJointVisibilityText()}
                 </button>

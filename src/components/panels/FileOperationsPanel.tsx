@@ -1,6 +1,4 @@
 import React, { memo, useRef } from 'react';
-import styles from './FileOperationsPanel.module.css';
-import { toast } from 'react-hot-toast';
 
 interface FileOperationsPanelProps {
     onSave: () => void;
@@ -15,13 +13,13 @@ const FileOperationsPanel: React.FC<FileOperationsPanelProps> = memo(({ onSave, 
     };
 
     return (
-        <div className={styles.group}>
-            <h3 className={styles.groupTitle}>File Operations</h3>
-            <div className={styles.buttonContainer}>
-                <button onClick={onSave} className={`${styles.button} ${styles.saveButton}`}>
+        <div className="group">
+            <h3 className="group-title">File Operations</h3>
+            <div className="button-container">
+                <button onClick={onSave} className="btn btn-primary">
                     Save
                 </button>
-                <button onClick={handleLoadClick} className={`${styles.button} ${styles.loadButton}`}>
+                <button onClick={handleLoadClick} className="btn">
                     Load
                 </button>
                 <input
