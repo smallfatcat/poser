@@ -6,7 +6,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
 }
 
 .track {
@@ -23,15 +23,42 @@
     width: 4px;
     height: 40px;
     background-color: #61dafb;
-    top: -16px;
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translate(-50%, -50%);
     pointer-events: auto;
     cursor: ew-resize;
+    z-index: 1;
+}
+
+.playhead::before,
+.playhead::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+.playhead::before {
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px 8px 0 8px;
+    border-color: #61dafb transparent transparent transparent;
+}
+
+.playhead::after {
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 8px 8px 8px;
+    border-color: transparent transparent #61dafb transparent;
 }
 
 .keyframeContainer {
     position: absolute;
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translate(-50%, -50%);
     cursor: pointer;
     width: 20px;
     height: 20px;
@@ -82,7 +109,7 @@
     width: 16px;
     height: 16px;
     background-color: #f0f0f0;
-    transform: translateY(-50%) rotate(45deg);
+    transform: rotate(45deg);
     cursor: ew-resize;
     border: 2px solid #282c34;
     z-index: 2;
@@ -91,4 +118,9 @@
 .keyframe.selected {
     background-color: #61dafb;
     border-color: #fff;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 0px;
 } 

@@ -18,12 +18,23 @@ import { Pose } from './types';
 import { useAnimation } from './hooks/useAnimation';
 import { useKeyframes } from './hooks/useKeyframes';
 
+type LoopMode = 'none' | 'loop' | 'pingPong';
+
 const App: React.FC = () => {
     const { width, height } = useWindowSize();
     const { currentPose, setPose } = usePose();
     const [animationDuration, setAnimationDuration] = useState(5000);
     const [currentTime, setCurrentTime] = useState(0);
     const [timeDisplayMode, setTimeDisplayMode] = useState<'seconds' | 'frames'>('seconds');
+    const [loopMode, setLoopMode] = useState<LoopMode>('none');
+
+    const toggleLoopMode = () => {
+        setLoopMode(prev => {
+            if (prev === 'none') return 'loop';
+            if (prev === 'loop') return 'pingPong';
+            return 'none';
+        });
+    };
 
     const toggleTimeDisplayMode = () => {
         setTimeDisplayMode(prev => prev === 'seconds' ? 'frames' : 'seconds');
@@ -31,6 +42,7 @@ const App: React.FC = () => {
 
     const {
         keyframes,
+        setKeyframes,
         selectedKeyframeId,
         scrubToTime,
         handleKeyframeTimeChange,
@@ -42,18 +54,26 @@ const App: React.FC = () => {
         setAnimationDuration,
     });
 
-    const handleScrub = useCallback((time: number) => {
+    const handleFrameChange = useCallback((time: number) => {
         setCurrentTime(time);
         scrubToTime(time);
     }, [setCurrentTime, scrubToTime]);
 
     const {
         isPlaying,
-        handlePlay
+        handlePlay,
+        setCurrentTime: setAnimationTime,
     } = useAnimation({
         animationDuration,
-        onFrame: handleScrub,
+        onFrame: handleFrameChange,
+        loop: loopMode !== 'none',
+        pingPong: loopMode === 'pingPong',
     });
+
+    const handleScrub = useCallback((time: number) => {
+        handleFrameChange(time);
+        setAnimationTime(time);
+    }, [handleFrameChange, setAnimationTime]);
 
     const [useRelativeConstraints, setUseRelativeConstraints] = useState(true);
     const [useInverseKinematics, setUseInverseKinematics] = useState(true);
@@ -80,22 +100,42 @@ const App: React.FC = () => {
         }
     };
 
-    const savePoseData = () => {
-        const poseData = JSON.stringify({ version: "1.2.0", pose: currentPose }, null, 2);
-        const blob = new Blob([poseData], { type: "application/json" });
-        saveAs(blob, "pose.json");
+    const handleSave = () => {
+        const animationData = {
+            version: "1.3.0",
+            animationDuration,
+            keyframes,
+        };
+        const data = JSON.stringify(animationData, null, 2);
+        const blob = new Blob([data], { type: "application/json" });
+        saveAs(blob, "animation.json");
     };
 
-    const onPoseLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = (event) => {
                 try {
                     const loadedData = JSON.parse(event.target?.result as string);
-                    if (loadedData.pose) {
+                    if (loadedData.keyframes && loadedData.animationDuration) {
+                        setAnimationDuration(loadedData.animationDuration);
+                        if (setKeyframes) {
+                            setKeyframes(loadedData.keyframes);
+                            if (loadedData.keyframes.length > 0) {
+                                const sorted = [...loadedData.keyframes].sort((a: any, b: any) => a.time - b.time);
+                                setPose(sorted[0].pose);
+                            }
+                        }
+                        toast.success("Animation loaded successfully!");
+                    } else if (loadedData.pose) {
                         setPose(loadedData.pose);
+                        if (setKeyframes) {
+                            setKeyframes([]);
+                        }
                         toast.success("Pose loaded successfully!");
+                    } else {
+                        toast.error("Invalid file format.");
                     }
                 } catch (err) {
                     toast.error("Failed to load or parse pose file.");
@@ -125,7 +165,7 @@ const App: React.FC = () => {
                     getJointVisibilityText={getJointVisibilityText}
                 />
                 <InspectorPanel>
-                    <FileOperationsPanel savePoseData={savePoseData} onPoseLoad={onPoseLoad} />
+                    <FileOperationsPanel onSave={handleSave} onLoad={handleLoad} />
                     <PropertiesPanel
                         boneLengths={currentPose}
                         onBoneLengthChange={(name: keyof Pose, value: number) => handleManualPoseChange({ ...currentPose, [name]: value })}
@@ -135,6 +175,8 @@ const App: React.FC = () => {
                         setAnimationDuration={setAnimationDuration}
                         timeDisplayMode={timeDisplayMode}
                         toggleTimeDisplayMode={toggleTimeDisplayMode}
+                        loopMode={loopMode}
+                        toggleLoopMode={toggleLoopMode}
                     />
                 </InspectorPanel>
             </Sidebar>

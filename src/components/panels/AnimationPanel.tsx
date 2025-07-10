@@ -1,14 +1,25 @@
 import React from 'react';
 import styles from './AnimationPanel.module.css';
 
+type LoopMode = 'none' | 'loop' | 'pingPong';
+
 interface AnimationPanelProps {
     animationDuration: number;
     setAnimationDuration: (duration: number) => void;
     timeDisplayMode: 'seconds' | 'frames';
     toggleTimeDisplayMode: () => void;
+    loopMode: LoopMode;
+    toggleLoopMode: () => void;
 }
 
-const AnimationPanel: React.FC<AnimationPanelProps> = ({ animationDuration, setAnimationDuration, timeDisplayMode, toggleTimeDisplayMode }) => {
+const AnimationPanel: React.FC<AnimationPanelProps> = ({
+    animationDuration,
+    setAnimationDuration,
+    timeDisplayMode,
+    toggleTimeDisplayMode,
+    loopMode,
+    toggleLoopMode,
+}) => {
     const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(e.target.value);
         if (timeDisplayMode === 'seconds') {
@@ -23,6 +34,18 @@ const AnimationPanel: React.FC<AnimationPanelProps> = ({ animationDuration, setA
             return (animationDuration / 1000).toFixed(2);
         }
         return Math.round(animationDuration / (1000 / 60));
+    };
+
+    const getLoopButtonText = () => {
+        switch (loopMode) {
+            case 'loop':
+                return 'Loop';
+            case 'pingPong':
+                return 'Ping Pong';
+            case 'none':
+            default:
+                return 'Off';
+        }
     };
 
     return (
@@ -45,6 +68,12 @@ const AnimationPanel: React.FC<AnimationPanelProps> = ({ animationDuration, setA
                 <label>Time Display</label>
                 <button onClick={toggleTimeDisplayMode} className={styles.toggleButton}>
                     {timeDisplayMode === 'seconds' ? 'Seconds' : 'Frames'}
+                </button>
+            </div>
+            <div className={styles.controlRow}>
+                <label>Loop</label>
+                <button onClick={toggleLoopMode} className={styles.toggleButton}>
+                    {getLoopButtonText()}
                 </button>
             </div>
         </div>

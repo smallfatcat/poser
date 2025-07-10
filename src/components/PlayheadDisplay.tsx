@@ -176,16 +176,18 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
             );
             })}
         </div>
-        <button 
-            onClick={onAddKeyframe} 
-            className={`${buttonStyles.button} ${buttonStyles.addButton}`}
-        >+</button>
-        <button
-            onClick={onPlay}
-            className={`${buttonStyles.button} ${buttonStyles.playButton}`}
-        >
-            {isPlaying ? '❚❚' : '▶'}
-        </button>
+        <div className={styles.buttonGroup}>
+            <button 
+                onClick={onAddKeyframe} 
+                className={`${buttonStyles.button} ${buttonStyles.addButton}`}
+            >+</button>
+            <button
+                onClick={onPlay}
+                className={`${buttonStyles.button} ${buttonStyles.playButton}`}
+            >
+                {isPlaying ? '❚❚' : '▶'}
+            </button>
+        </div>
     </div>
   );
 };

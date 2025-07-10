@@ -7,9 +7,20 @@ export const interpolate = (start: number, end: number, t: number): number => {
     return start + (end - start) * t;
 };
 
+// Interpolate between two angles, taking the shortest path
+export const interpolateAngle = (start: number, end: number, t: number): number => {
+    let diff = end - start;
+    if (diff > 180) {
+        diff -= 360;
+    } else if (diff < -180) {
+        diff += 360;
+    }
+    return start + diff * t;
+};
+
 // Interpolate between two poses
 export const interpolatePose = (poseA: Pose, poseB: Pose, t: number): Pose => {
-    const interpolatedPose: Pose = {};
+    const interpolatedPose: Pose = { hip: { x: 0, y: 0 } } as Pose;
     
     // Interpolate hip position
     if (typeof poseA.hip === 'object' && typeof poseB.hip === 'object') {
@@ -30,7 +41,7 @@ export const interpolatePose = (poseA: Pose, poseB: Pose, t: number): Pose => {
     
     angleProps.forEach(prop => {
         if (typeof poseA[prop] === 'number' && typeof poseB[prop] === 'number') {
-            interpolatedPose[prop] = interpolate(poseA[prop] as number, poseB[prop] as number, t);
+            interpolatedPose[prop] = interpolateAngle(poseA[prop] as number, poseB[prop] as number, t);
         }
     });
     

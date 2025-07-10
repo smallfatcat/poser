@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import { Keyframe } from '../components/PlayheadDisplay';
 import { Pose } from '../types';
-import { interpolatePose, easing } from '../utils/poseInterpolation';
+import { interpolatePose } from '../utils/poseInterpolation';
 import { usePose } from '../context/PoseContext';
 
 interface UseKeyframesProps {
@@ -61,8 +61,7 @@ export const useKeyframes = ({
                 return;
             }
             const progress = (time - prevKeyframe.time) / duration;
-            const easedProgress = easing.easeInOutQuad(progress);
-            const interpolated = interpolatePose(prevKeyframe.pose, nextKeyframe.pose, easedProgress);
+            const interpolated = interpolatePose(prevKeyframe.pose, nextKeyframe.pose, progress);
             setPose(interpolated);
         } else if (prevKeyframe) {
             setPose(prevKeyframe.pose);
@@ -166,6 +165,7 @@ export const useKeyframes = ({
 
     return {
         keyframes,
+        setKeyframes,
         selectedKeyframeId,
         scrubToTime,
         handleKeyframeTimeChange,
