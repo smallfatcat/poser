@@ -1,0 +1,143 @@
+import { useState, useCallback, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
+import { Keyframe } from '../components/PlayheadDisplay';
+import { Pose } from '../types';
+import { interpolatePose, easing } from '../utils/poseInterpolation';
+import { usePose } from '../context/PoseContext';
+
+interface UseKeyframesProps {
+    animationDuration: number;
+    setAnimationDuration: (duration: number) => void;
+}
+
+export const useKeyframes = ({
+    animationDuration,
+    setAnimationDuration,
+}: UseKeyframesProps) => {
+    const { currentPose, setPose } = usePose();
+    const [keyframes, setKeyframes] = useState<Keyframe[]>([]);
+    const [selectedKeyframeId, setSelectedKeyframeId] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        if (keyframes.length === 0 && currentPose) {
+            const initialKeyframe: Keyframe = {
+                id: `keyframe_initial_${Date.now()}`,
+                pose: JSON.parse(JSON.stringify(currentPose)), // Deep copy
+                time: 0,
+            };
+            setKeyframes([initialKeyframe]);
+            setSelectedKeyframeId(initialKeyframe.id);
+        }
+    }, [keyframes, currentPose]);
+
+    const scrubToTime = useCallback((time: number) => {
+        if (keyframes.length < 2) {
+            if (keyframes.length === 1) setPose(keyframes[0].pose);
+            return;
+        }
+
+        const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
+
+        const prevKeyframe = sortedKeyframes.slice().reverse().find(k => k.time <= time);
+        const nextKeyframe = sortedKeyframes.find(k => k.time >= time);
+
+        if (prevKeyframe && nextKeyframe) {
+            const duration = nextKeyframe.time - prevKeyframe.time;
+            if (duration === 0) {
+                setPose(prevKeyframe.pose);
+                return;
+            }
+            const progress = (time - prevKeyframe.time) / duration;
+            const easedProgress = easing.easeInOutQuad(progress);
+            const interpolated = interpolatePose(prevKeyframe.pose, nextKeyframe.pose, easedProgress);
+            setPose(interpolated);
+        } else if (prevKeyframe) {
+            setPose(prevKeyframe.pose);
+        } else if (nextKeyframe) {
+            setPose(nextKeyframe.pose);
+        }
+    }, [keyframes, setPose]);
+
+    const handleKeyframeTimeChange = (id: string, time: number) => {
+        const otherKeyframes = keyframes.filter(k => k.id !== id);
+        if (otherKeyframes.some(k => Math.abs(k.time - time) < 10)) { // 10ms threshold
+            return;
+        }
+
+        const updatedKeyframes = keyframes.map(k =>
+            k.id === id ? { ...k, time } : k
+        );
+        setKeyframes(updatedKeyframes);
+        scrubToTime(time);
+    };
+
+    const handleAddKeyframe = useCallback((time: number) => {
+        const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
+        const selectedIndex = selectedKeyframeId ? sortedKeyframes.findIndex(k => k.id === selectedKeyframeId) : -1;
+
+        let newTime: number;
+
+        if (sortedKeyframes.length === 1 && selectedIndex !== -1) {
+            newTime = animationDuration;
+        } else if (selectedIndex !== -1) {
+            const isLastFrame = selectedIndex === sortedKeyframes.length - 1;
+            if (isLastFrame) {
+                newTime = animationDuration + 1000;
+                setAnimationDuration(newTime);
+            } else {
+                const currentKeyframe = sortedKeyframes[selectedIndex];
+                const nextKeyframe = sortedKeyframes[selectedIndex + 1];
+                newTime = currentKeyframe.time + (nextKeyframe.time - currentKeyframe.time) / 2;
+            }
+        } else {
+            newTime = time;
+        }
+
+        const keyframeAtNewTime = keyframes.find(k => k.time === newTime);
+        if (keyframeAtNewTime) {
+            toast.error("A keyframe already exists at the calculated time. Please adjust.");
+            return;
+        }
+
+        const newKeyframe: Keyframe = {
+            id: `keyframe_${Date.now()}`,
+            pose: JSON.parse(JSON.stringify(currentPose)), // Deep copy
+            time: newTime,
+        };
+
+        setKeyframes(prev => [...prev, newKeyframe].sort((a, b) => a.time - b.time));
+        setSelectedKeyframeId(newKeyframe.id);
+        scrubToTime(newTime);
+        toast.success("Keyframe added!");
+    }, [currentPose, keyframes, selectedKeyframeId, animationDuration, setAnimationDuration, scrubToTime]);
+
+    const handleSelectKeyframe = useCallback((id: string) => {
+        const keyframe = keyframes.find(k => k.id === id);
+        if (keyframe && setPose) {
+            setPose(keyframe.pose);
+            setSelectedKeyframeId(id);
+            scrubToTime(keyframe.time);
+        }
+    }, [keyframes, setPose, scrubToTime]);
+
+    const handleManualPoseChange = (newPose: Pose) => {
+        setPose(newPose);
+
+        if (selectedKeyframeId) {
+            const updatedKeyframes = keyframes.map(k =>
+                k.id === selectedKeyframeId ? { ...k, pose: newPose } : k
+            );
+            setKeyframes(updatedKeyframes);
+        }
+    };
+
+    return {
+        keyframes,
+        selectedKeyframeId,
+        scrubToTime,
+        handleKeyframeTimeChange,
+        handleAddKeyframe,
+        handleSelectKeyframe,
+        handleManualPoseChange
+    };
+}; 

@@ -18,6 +18,8 @@ interface PoseControlsProps {
     onPoseLoad: (e: React.ChangeEvent<HTMLInputElement>) => void;
     boneLengths: Pose;
     onBoneLengthChange: (name: string, value: number) => void;
+    animationDuration: number;
+    setAnimationDuration: (duration: number) => void;
 }
 
 const PoseControls: React.FC<PoseControlsProps> = ({
@@ -33,6 +35,8 @@ const PoseControls: React.FC<PoseControlsProps> = ({
     onPoseLoad,
     boneLengths,
     onBoneLengthChange,
+    animationDuration,
+    setAnimationDuration,
 }) => {
     return (
         <div className={styles.container}>
@@ -47,6 +51,20 @@ const PoseControls: React.FC<PoseControlsProps> = ({
                     getJointVisibilityText={getJointVisibilityText}
                 />
             )}
+            <div className={styles.controlSection}>
+                <h4>Animation</h4>
+                <div className={styles.controlRow}>
+                    <label htmlFor="duration">Duration (ms)</label>
+                    <input
+                        type="number"
+                        id="duration"
+                        value={animationDuration}
+                        onChange={(e) => setAnimationDuration(Number(e.target.value))}
+                        step={100}
+                        className={styles.numberInput}
+                    />
+                </div>
+            </div>
 
             <FileOperations savePoseData={savePoseData} onPoseLoad={onPoseLoad} />
 

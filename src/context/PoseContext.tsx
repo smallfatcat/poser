@@ -5,6 +5,7 @@ import { Pose } from '../types';
 interface PoseContextType {
     currentPose: Pose;
     onPoseChange: (pose: Pose) => void;
+    setPose: React.Dispatch<React.SetStateAction<Pose>>;
 }
 
 const PoseContext = createContext<PoseContextType | undefined>(undefined);
@@ -31,6 +32,7 @@ export const PoseProvider = ({ children }: PoseProviderProps) => {
     const value = {
         currentPose,
         onPoseChange: handlePoseChange,
+        setPose: setCurrentPose,
     };
 
     return (

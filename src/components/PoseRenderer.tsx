@@ -16,6 +16,11 @@ interface PoseRendererProps {
     className?: string;
     style?: React.CSSProperties;
     draggable?: boolean;
+    pose: Pose;
+    onPoseChange: (pose: Pose) => void;
+    useRelativeConstraints: boolean;
+    useInverseKinematics: boolean;
+    jointVisibility: 'always' | 'hover' | 'never';
 }
 
 const PoseRenderer: React.FC<PoseRendererProps> = ({ 
@@ -26,15 +31,15 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
     headRadius = 15,
     className = '',
     style = {},
-    draggable = false
+    draggable = false,
+    pose,
+    onPoseChange,
+    useRelativeConstraints,
+    useInverseKinematics,
+    jointVisibility,
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const { currentPose: poseFromContext, onPoseChange } = usePose();
-
-    const [useRelativeConstraints, setUseRelativeConstraints] = useState(true);
-    const [useInverseKinematics, setUseInverseKinematics] = useState(false);
     const [excludedJoints, setExcludedJoints] = useState(new Set<string>());
-    const [jointVisibility, setJointVisibility] = useState<'always' | 'hover' | 'never'>('always'); // 'always', 'hover', 'never'
 
     const {
         draggedJoint,
@@ -45,7 +50,7 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
         getEventPos,
         getJointAtPosition
     } = usePoseInteraction({
-        pose: poseFromContext,
+        pose,
         onPoseChange,
         draggable,
         canvasRef,
@@ -142,17 +147,20 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
     };
 
     const toggleJointVisibility = () => {
-        setJointVisibility(prev => {
-            if (prev === 'always') return 'hover';
-            if (prev === 'hover') return 'never';
-            return 'always';
-        });
+        // This function is no longer needed as jointVisibility is passed as a prop
+        // setJointVisibility(prev => {
+        //     if (prev === 'always') return 'hover';
+        //     if (prev === 'hover') return 'never';
+        //     return 'always';
+        // });
     };
 
     const getJointVisibilityText = () => {
-        if (jointVisibility === 'always') return 'Joints: Always';
-        if (jointVisibility === 'hover') return 'Joints: On Hover';
-        return 'Joints: Hidden';
+        // This function is no longer needed as jointVisibility is passed as a prop
+        // if (jointVisibility === 'always') return 'Joints: Always';
+        // if (jointVisibility === 'hover') return 'Joints: On Hover';
+        // return 'Joints: Hidden';
+        return 'Joints: Always'; // Default to always visible for now
     };
 
     return (
@@ -180,22 +188,6 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
                     v{__APP_VERSION__}
                 </div>
             </div>
-            {draggable && (
-                 <PoseControls
-                    draggable={draggable}
-                    useRelativeConstraints={useRelativeConstraints}
-                    setUseRelativeConstraints={setUseRelativeConstraints}
-                    useInverseKinematics={useInverseKinematics}
-                    setUseInverseKinematics={setUseInverseKinematics}
-                    jointVisibility={jointVisibility}
-                    toggleJointVisibility={toggleJointVisibility}
-                    getJointVisibilityText={getJointVisibilityText}
-                    savePoseData={savePoseData}
-                    onPoseLoad={handlePoseLoad}
-                    boneLengths={currentPose}
-                    onBoneLengthChange={handleBoneLengthChange}
-                />
-            )}
         </div>
     );
 };
