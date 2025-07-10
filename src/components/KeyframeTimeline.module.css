@@ -1,0 +1,74 @@
+.timelineWrapper {
+  margin-top: 20px;
+}
+
+.timelineContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow-x: auto;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  min-height: 140px;
+}
+
+.thumbnail {
+  width: 100px;
+  height: 100px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.timeLabel {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.thumbnail.selected {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.thumbnail:hover {
+  border-color: #0056b3;
+}
+
+.addButton {
+  width: 100px;
+  height: 100px;
+  font-size: 3rem;
+  font-weight: bold;
+  color: #6c757d;
+  background-color: #e9ecef;
+  border: 2px dashed #ced4da;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.addButton:hover {
+  background-color: #dee2e6;
+  color: #495057;
+  border-color: #adb5bd;
+} 

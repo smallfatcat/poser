@@ -20,6 +20,7 @@ interface PoseCanvasProps {
     excludedJoints: Set<string>;
     className: string;
     style: React.CSSProperties;
+    shouldClear?: boolean;
 }
 
 const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
@@ -38,15 +39,18 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
     excludedJoints,
     className,
     style,
+    shouldClear = true,
 }, ref) => {
+    const internalRef = useRef<HTMLCanvasElement>(null);
+    const canvasRef = (ref as React.RefObject<HTMLCanvasElement>) || internalRef;
     const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
     useEffect(() => {
-        const canvas = (ref as React.RefObject<HTMLCanvasElement>)?.current;
+        const canvas = canvasRef.current;
         if (canvas) {
             ctxRef.current = canvas.getContext('2d');
         }
-    }, [ref]);
+    }, [canvasRef]);
 
     useEffect(() => {
         const ctx = ctxRef.current;
@@ -70,6 +74,9 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
                 height,
                 drawJoints
             };
+            if(shouldClear) {
+                ctx.clearRect(0, 0, width, height);
+            }
             drawPose(ctx, poseCoordinates, styleConfig, drawConfig);
         }
     }, [
@@ -87,6 +94,7 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
         ikChains,
         width,
         height,
+        shouldClear
     ]);
 
     const canvasClasses = [
@@ -98,7 +106,7 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
 
     return (
         <canvas
-            ref={ref}
+            ref={canvasRef}
             width={width}
             height={height}
             className={canvasClasses}

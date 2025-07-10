@@ -113,7 +113,7 @@ export const usePoseInteraction = ({
         e.preventDefault();
         const mousePos = getEventPos(e);
         
-        let newPose = { ...currentPose };
+        let newPose = JSON.parse(JSON.stringify(currentPose)); // Deep copy
         
         if (useInverseKinematics) {
             let ikChain: string[] | null = null;

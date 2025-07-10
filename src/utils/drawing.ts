@@ -87,8 +87,7 @@ export const drawPose = (
 ) => {
     if (!ctx) return;
 
-    // Clear canvas
-    ctx.clearRect(0, 0, width, height);
+    // Clear canvas is now handled in PoseCanvasComponent
     
     // Set drawing style
     ctx.strokeStyle = strokeColor;
