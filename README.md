@@ -134,33 +134,48 @@ The `PoseControls` component offers a user interface for manipulating the pose a
 
 ## Pose Data Structure
 
-The `pose` object is a collection of points representing the joints of the stick figure.
+The application can save and load poses as JSON files. The exported file has the following structure:
 
-```typescript
-interface PosePoint {
-    x: number;
-    y: number;
-}
-
-interface Pose {
-    head: PosePoint;
-    neck: PosePoint;
-    shoulder: PosePoint;
-    leftUpperArm: PosePoint;
-    leftLowerArm: PosePoint;
-    leftHand: PosePoint;
-    rightUpperArm: PosePoint;
-    rightLowerArm: PosePoint;
-    rightHand: PosePoint;
-    hip: PosePoint;
-    leftUpperLeg: PosePoint;
-    leftLowerLeg: PosePoint;
-    leftFoot: PosePoint;
-    rightUpperLeg: PosePoint;
-    rightLowerLeg: PosePoint;
-    rightFoot: PosePoint;
+```json
+{
+  "version": "1.1.1",
+  "pose": {
+    "hip": { "x": 300, "y": 218 },
+    "torsoLength": 80,
+    "torsoAngle": 90,
+    "neckLength": 20,
+    "neckAngle": 90,
+    "headAngle": 90,
+    "upperArmLength": 60,
+    "lowerArmLength": 55,
+    "handLength": 25,
+    "leftUpperArmAngle": 225,
+    "leftLowerArmAngle": 225,
+    "leftHandAngle": 225,
+    "rightUpperArmAngle": 315,
+    "rightLowerArmAngle": 315,
+    "rightHandAngle": 315,
+    "upperLegLength": 70,
+    "lowerLegLength": 65,
+    "footLength": 30,
+    "leftUpperLegAngle": 225,
+    "leftLowerLegAngle": 225,
+    "leftFootAngle": 225,
+    "rightUpperLegAngle": 315,
+    "rightLowerLegAngle": 315,
+    "rightFootAngle": 315
+  },
+  "timestamp": "2023-12-25T12:00:00.000Z",
+  "description": "Saved pose data"
 }
 ```
+
+The `pose` object itself contains a mix of coordinates, angles, and lengths:
+-   `hip`: The `(x, y)` coordinates for the base position of the pose.
+-   `...Length`: The length of each body part in pixels. These are adjustable via the "Bone Lengths" controls.
+-   `...Angle`: The angle of each joint in degrees, relative to its parent.
+
+This structure allows for a flexible and detailed representation of the pose.
 
 ## TypeScript Support
 
