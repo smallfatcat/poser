@@ -101,17 +101,6 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = memo(({ boneLengths, onB
                 <BoneSlider name="rightLowerLegLength" value={boneLengths.rightLowerLegLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightFootLength" value={boneLengths.rightFootLength as number} onChange={onBoneLengthChange} />
             </div>
-            
-            <h3 className={styles.groupTitle}>Transform</h3>
-            <div className={styles.slidersContainer}>
-                <BoneSlider 
-                    name="scale" 
-                    value={Math.round((boneLengths.scale as number || 1) * 100)} 
-                    onChange={(name, value) => onBoneLengthChange(name, value / 100)}
-                    min={10}
-                    max={300}
-                />
-            </div>
         </div>
     );
 });

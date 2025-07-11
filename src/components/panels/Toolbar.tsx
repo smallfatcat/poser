@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { useSettings } from '../../context/SettingsContext';
+import { usePose } from '../../context/PoseContext';
 
 const Toolbar: React.FC = memo(() => {
     const {
@@ -12,6 +13,13 @@ const Toolbar: React.FC = memo(() => {
         onionSkinning,
         setOnionSkinning,
     } = useSettings();
+
+    const { currentPose, setPose } = usePose();
+
+    const handleScaleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newScale = parseFloat(e.target.value) / 100;
+        setPose({ ...currentPose, scale: newScale });
+    };
 
     return (
         <div className="group">
@@ -41,6 +49,19 @@ const Toolbar: React.FC = memo(() => {
                 >
                     Onion Skin
                 </button>
+            </div>
+            <div className="control-row">
+                <label htmlFor="scale-slider">
+                    Scale: {Math.round((currentPose.scale as number || 1) * 100)}%
+                </label>
+                <input
+                    type="range"
+                    id="scale-slider"
+                    min="10"
+                    max="300"
+                    value={Math.round((currentPose.scale as number || 1) * 100)}
+                    onChange={handleScaleChange}
+                />
             </div>
         </div>
     );
