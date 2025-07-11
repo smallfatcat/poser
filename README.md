@@ -6,12 +6,15 @@ A React-based application for creating and animating 2D stick figures with a key
 
 - 🎨 **Interactive Pose-Drawing Canvas**: A customizable React component for rendering and dragging stick figure poses.
 - 🎬 **Keyframe Animation**: Create animations by setting poses at different points in time on a timeline.
-- timeline **Timeline & Playback**: A timeline with a playhead, keyframe markers, and playback controls (play, pause, loop).
+- ⏱️ **Timeline & Playback**: A timeline with a playhead, keyframe markers, and playback controls (play, pause, loop).
 - 🎛️ **Advanced Interaction Controls**: A toolbar for fine-tuning interaction settings.
 - **Inverse Kinematics (IK)**: Enable or disable IK for more natural joint movement when dragging.
 - **Adjustable Bone Lengths**: Dynamically change the length of limbs and torso.
 - **Save & Load**: Save your animations or static poses as JSON files and load them back into the editor.
 - **Joint Visibility Control**: Toggle the visibility of joints for a cleaner look.
+- 🧅 **Onion Skinning**: View previous and next keyframes as ghost poses for better animation reference.
+- 🔄 **Loop Modes**: Choose between no loop, regular loop, or ping-pong animation modes.
+- ⌨️ **Keyboard Shortcuts**: Navigate between keyframes and add keyframes with keyboard controls.
 - ⚡ **Built with TypeScript & Vite**: A modern, fast, and type-safe development environment.
 
 ## Getting Started
@@ -42,10 +45,18 @@ The application's UI is divided into several panels:
 *   **Viewport**: The main canvas where the pose is rendered and can be interactively manipulated.
 *   **Timeline**: Below the viewport, this panel shows the animation timeline, keyframes, and playback controls.
 *   **Sidebar**: Contains all the control panels.
-    *   **Toolbar**: Toggles for Inverse Kinematics, Relative Constraints, and Joint Visibility.
+    *   **Toolbar**: Toggles for Inverse Kinematics, Relative Constraints, Joint Visibility, and Onion Skinning.
     *   **File Operations**: Buttons to save and load animation or pose files.
     *   **Properties**: Sliders to adjust the length of each bone in the pose.
     *   **Animation**: Settings for animation duration, time display (seconds/frames), and loop mode.
+
+## Keyboard Shortcuts
+
+- **Left Arrow**: Navigate to previous keyframe
+- **Right Arrow**: Navigate to next keyframe
+- **Shift + Left Arrow**: Step back one frame (60 FPS)
+- **Shift + Right Arrow**: Step forward one frame (60 FPS)
+- **Spacebar**: Add keyframe at current time
 
 ## `PoseRenderer` Props
 
@@ -62,7 +73,8 @@ The application's UI is divided into several panels:
 | `strokeColor` | `string` | `'#00ff00'` | Color of the stick figure. |
 | `strokeWidth` | `number` | `3` | Width of the lines. |
 | `headRadius` | `number` | `15` | Radius of the head circle. |
-
+| `prevPose` | `Pose \| null` | `null` | Previous keyframe pose for onion skinning. |
+| `nextPose` | `Pose \| null` | `null` | Next keyframe pose for onion skinning. |
 
 ## Data Structure
 
@@ -72,7 +84,7 @@ The application can save and load animations or single poses as JSON files.
 
 ```json
 {
-  "version": "1.3.0",
+  "version": "1.3.2",
   "animationDuration": 5000,
   "keyframes": [
     {
@@ -120,9 +132,11 @@ This structure allows for a flexible and detailed representation of the pose and
 
 ## TypeScript
 
-The entire application is built with TypeScript. All components and data structures are fully typed.
+The entire application is built with TypeScript. All components and data structures are fully typed, providing excellent developer experience with autocomplete and type safety.
 
 ## Browser Support
 
 - Chrome 60+
-- Firefox 55+ 
+- Firefox 55+
+- Safari 12+
+- Edge 79+ 
