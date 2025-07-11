@@ -48,6 +48,7 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
     const {
         useRelativeConstraints,
         useInverseKinematics,
+        disableConstraints,
         jointVisibility,
     } = useSettings();
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -69,6 +70,7 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
         useInverseKinematics,
         excludedJoints,
         useRelativeConstraints,
+        disableConstraints,
         guidePositions,
         setGuidePositions,
         width,

@@ -1,6 +1,54 @@
-import { jointHierarchy } from '../constants/joints';
+import { jointHierarchy, boneConnections } from '../constants/joints';
 import { poseToCoordinates } from './poseAngleToCoordinates';
 import { Pose, Vector2 } from '../types';
+
+// Function to calculate bone lengths from joint positions
+export const calculateBoneLengthsFromPositions = (
+    jointPositions: { [key: string]: Vector2 },
+    currentPose: Pose
+): Partial<Pose> => {
+    const newBoneLengths: Partial<Pose> = {};
+    const scale = currentPose.scale || 1;
+    
+    // Map bone connections to their corresponding length parameters
+    const boneLengthMap: { [key: string]: string } = {
+        'hip-shoulder': 'torsoLength',
+        'shoulder-neck': 'neckLength',
+        'shoulder-leftShoulder': 'leftShoulderLength',
+        'leftShoulder-leftUpperArm': 'leftUpperArmLength',
+        'leftUpperArm-leftLowerArm': 'leftLowerArmLength',
+        'leftLowerArm-leftHand': 'leftHandLength',
+        'shoulder-rightShoulder': 'rightShoulderLength',
+        'rightShoulder-rightUpperArm': 'rightUpperArmLength',
+        'rightUpperArm-rightLowerArm': 'rightLowerArmLength',
+        'rightLowerArm-rightHand': 'rightHandLength',
+        'hip-leftHip': 'leftHipLength',
+        'leftHip-leftUpperLeg': 'leftUpperLegLength',
+        'leftUpperLeg-leftLowerLeg': 'leftLowerLegLength',
+        'leftLowerLeg-leftFoot': 'leftFootLength',
+        'hip-rightHip': 'rightHipLength',
+        'rightHip-rightUpperLeg': 'rightUpperLegLength',
+        'rightUpperLeg-rightLowerLeg': 'rightLowerLegLength',
+        'rightLowerLeg-rightFoot': 'rightFootLength',
+    };
+
+    boneConnections.forEach(([start, end]) => {
+        const startPos = jointPositions[start as string];
+        const endPos = jointPositions[end as string];
+        const boneKey = `${start}-${end}`;
+        const lengthKey = boneLengthMap[boneKey];
+        
+        if (startPos && endPos && lengthKey) {
+            const dx = endPos.x - startPos.x;
+            const dy = endPos.y - startPos.y;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            // Convert from scaled coordinates back to base bone length
+            newBoneLengths[lengthKey] = length / scale;
+        }
+    });
+
+    return newBoneLengths;
+};
 
 // Function to calculate inverse kinematics for a chain
 export const calculateInverseKinematics = (

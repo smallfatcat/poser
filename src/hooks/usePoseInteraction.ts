@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, RefObject } from 'react';
 import { poseToCoordinates } from '../utils/poseAngleToCoordinates';
 import { jointHierarchy, ikChains } from '../constants/joints';
-import { calculateInverseKinematics, updateChildJoints } from '../utils/kinematics';
+import { calculateInverseKinematics, updateChildJoints, calculateBoneLengthsFromPositions } from '../utils/kinematics';
 import { Pose, Vector2, PoseCoordinates, IkChains } from '../types';
 
 interface UsePoseInteractionProps {
@@ -12,6 +12,7 @@ interface UsePoseInteractionProps {
     useInverseKinematics: boolean;
     excludedJoints: Set<string>;
     useRelativeConstraints: boolean;
+    disableConstraints: boolean;
     guidePositions: { x: number; y: number };
     setGuidePositions: (positions: { x: number; y: number }) => void;
     width: number;
@@ -36,6 +37,7 @@ export const usePoseInteraction = ({
     useInverseKinematics,
     excludedJoints,
     useRelativeConstraints,
+    disableConstraints,
     guidePositions,
     setGuidePositions,
     width,
@@ -145,7 +147,67 @@ export const usePoseInteraction = ({
         
         let newPose = JSON.parse(JSON.stringify(currentPose)); // Deep copy
         
-        if (useInverseKinematics) {
+        // Handle unconstrained dragging (disableConstraints = true)
+        if (disableConstraints) {
+            const targetPos = {
+                x: mousePos.x - (dragStartOffset ? dragStartOffset.x : 0),
+                y: mousePos.y - (dragStartOffset ? dragStartOffset.y : 0)
+            };
+
+            if (draggedJoint === 'hip') {
+                newPose.hip = { x: targetPos.x, y: targetPos.y };
+            } else {
+                // For all other joints, update angle and bone length from parent
+                const jointInfo = jointHierarchy[draggedJoint];
+                if (jointInfo) {
+                    const { parent, angleParam, needsOffset } = jointInfo;
+                    const parentPos = (poseToCoordinates(newPose) as any)[parent];
+                    if (parentPos) {
+                        const dx = targetPos.x - parentPos.x;
+                        const dy = -(targetPos.y - parentPos.y);
+                        let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                        if (angle < 0) angle += 360;
+                        if (needsOffset) angle = (angle - 90 + 360) % 360;
+                        newPose[angleParam] = angle;
+                        // Update bone length
+                        const dxLen = targetPos.x - parentPos.x;
+                        const dyLen = targetPos.y - parentPos.y;
+                        const length = Math.sqrt(dxLen * dxLen + dyLen * dyLen) / (newPose.scale || 1);
+                        // Find the correct length key
+                        const boneLengthMap: { [key: string]: string } = {
+                            'hip-shoulder': 'torsoLength',
+                            'shoulder-neck': 'neckLength',
+                            'shoulder-leftShoulder': 'leftShoulderLength',
+                            'leftShoulder-leftUpperArm': 'leftUpperArmLength',
+                            'leftUpperArm-leftLowerArm': 'leftLowerArmLength',
+                            'leftLowerArm-leftHand': 'leftHandLength',
+                            'shoulder-rightShoulder': 'rightShoulderLength',
+                            'rightShoulder-rightUpperArm': 'rightUpperArmLength',
+                            'rightUpperArm-rightLowerArm': 'rightLowerArmLength',
+                            'rightLowerArm-rightHand': 'rightHandLength',
+                            'hip-leftHip': 'leftHipLength',
+                            'leftHip-leftUpperLeg': 'leftUpperLegLength',
+                            'leftUpperLeg-leftLowerLeg': 'leftLowerLegLength',
+                            'leftLowerLeg-leftFoot': 'leftFootLength',
+                            'hip-rightHip': 'rightHipLength',
+                            'rightHip-rightUpperLeg': 'rightUpperLegLength',
+                            'rightUpperLeg-rightLowerLeg': 'rightLowerLegLength',
+                            'rightLowerLeg-rightFoot': 'rightFootLength',
+                        };
+                        const boneKey = `${parent}-${draggedJoint}`;
+                        const lengthKey = boneLengthMap[boneKey];
+                        if (lengthKey) {
+                            newPose[lengthKey] = length;
+                        }
+                    }
+                }
+            }
+            // Calculate new bone lengths from the updated joint positions
+            const updatedCoordinates = poseToCoordinates(newPose);
+            const newBoneLengths = calculateBoneLengthsFromPositions(updatedCoordinates, newPose);
+            // Update the pose with new bone lengths
+            Object.assign(newPose, newBoneLengths);
+        } else if (useInverseKinematics) {
             let ikChain: string[] | null = null;
             if (draggedJoint === 'head') {
                 ikChain = (ikChains as IkChains).head;
@@ -271,6 +333,7 @@ export const usePoseInteraction = ({
         currentPose,
         excludedJoints,
         useRelativeConstraints,
+        disableConstraints,
         dragStartOffset,
         draggedGuide,
         guidePositions,

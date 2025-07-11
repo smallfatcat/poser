@@ -35,4 +35,16 @@
 .control-row label {
     color: #e0e0e0;
     font-size: 14px;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #555;
+    color: #888;
+}
+
+.btn:disabled:hover {
+    background-color: #555;
+    color: #888;
 } 

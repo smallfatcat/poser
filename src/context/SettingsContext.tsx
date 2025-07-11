@@ -9,6 +9,8 @@ interface SettingsContextType {
     setUseRelativeConstraints: (value: boolean) => void;
     useInverseKinematics: boolean;
     setUseInverseKinematics: (value: boolean) => void;
+    disableConstraints: boolean;
+    setDisableConstraints: (value: boolean) => void;
     jointVisibility: JointVisibility;
     toggleJointVisibility: () => void;
     getJointVisibilityText: () => string;
@@ -25,6 +27,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [useRelativeConstraints, setUseRelativeConstraints] = useState(true);
     const [useInverseKinematics, setUseInverseKinematics] = useState(true);
+    const [disableConstraints, setDisableConstraints] = useState(false);
     const [jointVisibility, setJointVisibility] = useState<JointVisibility>('hover');
     const [onionSkinning, setOnionSkinning] = useState(false);
     const [timeDisplayMode, setTimeDisplayMode] = useState<TimeDisplayMode>('seconds');
@@ -62,6 +65,8 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         setUseRelativeConstraints,
         useInverseKinematics,
         setUseInverseKinematics,
+        disableConstraints,
+        setDisableConstraints,
         jointVisibility,
         toggleJointVisibility,
         getJointVisibilityText,

@@ -8,6 +8,8 @@ const Toolbar: React.FC = memo(() => {
         setUseRelativeConstraints,
         useInverseKinematics,
         setUseInverseKinematics,
+        disableConstraints,
+        setDisableConstraints,
         toggleJointVisibility,
         getJointVisibilityText,
         onionSkinning,
@@ -26,14 +28,22 @@ const Toolbar: React.FC = memo(() => {
             <h3 className="group-title">Interaction Settings</h3>
             <div className="button-container">
                 <button
+                    onClick={() => setDisableConstraints(!disableConstraints)}
+                    className={`btn ${disableConstraints ? 'active' : ''}`}
+                >
+                    {disableConstraints ? 'Constraints: Off' : 'Constraints: On'}
+                </button>
+                <button
                     onClick={() => setUseRelativeConstraints(!useRelativeConstraints)}
                     className={`btn ${useRelativeConstraints ? 'active' : ''}`}
+                    disabled={disableConstraints}
                 >
                     {useRelativeConstraints ? 'Constraints: Rel' : 'Constraints: Abs'}
                 </button>
                 <button
                     onClick={() => setUseInverseKinematics(!useInverseKinematics)}
                     className={`btn ${useInverseKinematics ? 'active' : ''}`}
+                    disabled={disableConstraints}
                 >
                     {useInverseKinematics ? 'IK: On' : 'IK: Off'}
                 </button>
