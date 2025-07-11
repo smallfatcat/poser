@@ -168,7 +168,7 @@ export const useKeyframes = ({
 
         if (selectedKeyframeId) {
             const updatedKeyframes = keyframesRef.current.map(k =>
-                k.id === selectedKeyframeId ? { ...k, pose: newPose } : k
+                k.id === selectedKeyframeId ? { ...k, pose: JSON.parse(JSON.stringify(newPose)) } : k
             );
             setKeyframes(updatedKeyframes);
         }

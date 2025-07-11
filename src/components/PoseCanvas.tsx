@@ -91,12 +91,25 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
                 ctx.clearRect(0, 0, width, height);
             }
             
-            const ghostStyle = { ...styleConfig, strokeColor: 'rgba(0, 255, 0, 0.2)' };
             if (prevPose) {
-                drawPose(ctx, poseToCoordinates(prevPose), ghostStyle, drawConfig);
+                const prevPoseScale = prevPose.scale || 1;
+                const prevHeadRadius = (prevPose.headRadius || headRadius) * prevPoseScale;
+                const prevGhostStyle = { 
+                    ...styleConfig, 
+                    strokeColor: 'rgba(0, 255, 0, 0.2)',
+                    headRadius: prevHeadRadius
+                };
+                drawPose(ctx, poseToCoordinates(prevPose), prevGhostStyle, drawConfig);
             }
             if (nextPose) {
-                drawPose(ctx, poseToCoordinates(nextPose), ghostStyle, drawConfig);
+                const nextPoseScale = nextPose.scale || 1;
+                const nextHeadRadius = (nextPose.headRadius || headRadius) * nextPoseScale;
+                const nextGhostStyle = { 
+                    ...styleConfig, 
+                    strokeColor: 'rgba(0, 255, 0, 0.2)',
+                    headRadius: nextHeadRadius
+                };
+                drawPose(ctx, poseToCoordinates(nextPose), nextGhostStyle, drawConfig);
             }
 
             drawPose(ctx, poseCoordinates, styleConfig, drawConfig);
