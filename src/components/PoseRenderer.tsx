@@ -1,6 +1,7 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { usePoseInteraction } from '../hooks/usePoseInteraction';
 import PoseCanvas from './PoseCanvas';
+import VideoBackground from './VideoBackground';
 import { usePose } from '../context/PoseContext';
 import styles from './PoseRenderer.module.css';
 import { toast } from 'react-hot-toast';
@@ -22,6 +23,8 @@ interface PoseRendererProps {
     setGuidePositions: (positions: { x: number; y: number }) => void;
     prevPose?: Pose | null;
     nextPose?: Pose | null;
+    currentTime?: number;
+    videoOpacity?: number;
 }
 
 const PoseRenderer: React.FC<PoseRendererProps> = ({ 
@@ -39,6 +42,8 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
     setGuidePositions,
     prevPose,
     nextPose,
+    currentTime = 0,
+    videoOpacity = 0.5,
 }) => {
     const {
         useRelativeConstraints,
@@ -176,7 +181,13 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
 
     return (
         <div className={styles.container}>
-            <div className={styles.canvasContainer} style={{ width, height }}>
+            <div className={styles.canvasContainer} style={{ width, height, position: 'relative' }}>
+                <VideoBackground
+                    width={width}
+                    height={height}
+                    currentTime={currentTime}
+                    opacity={videoOpacity}
+                />
                 <PoseCanvas
                     ref={canvasRef}
                     width={width}
@@ -193,10 +204,11 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
                     hoveredJoint={hoveredJoint}
                     excludedJoints={excludedJoints}
                     className={className}
-                    style={style}
+                    style={{ ...style, position: 'relative', zIndex: 1 }}
                     guidePositions={guidePositions}
                     prevPose={prevPose}
                     nextPose={nextPose}
+                    currentPose={pose}
                 />
                 <div className={styles.version}>
                     v{__APP_VERSION__}

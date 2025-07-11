@@ -9,7 +9,8 @@ A React-based application for creating and animating 2D stick figures with a key
 - ⏱️ **Timeline & Playback**: A timeline with a playhead, keyframe markers, and playback controls (play, pause, loop).
 - 🎛️ **Advanced Interaction Controls**: A toolbar for fine-tuning interaction settings.
 - **Inverse Kinematics (IK)**: Enable or disable IK for more natural joint movement when dragging.
-- **Adjustable Bone Lengths**: Dynamically change the length of limbs and torso.
+- **Adjustable Bone Lengths**: Dynamically change the length of limbs and torso with separate left/right controls.
+- **Bone Length Animation**: Animate individual bone lengths for more realistic movement and character development. Works independently of scaling.
 - **Save & Load**: Save your animations or static poses as JSON files and load them back into the editor.
 - **Joint Visibility Control**: Toggle the visibility of joints for a cleaner look.
 - 🧅 **Onion Skinning**: View previous and next keyframes as ghost poses for better animation reference.
@@ -47,7 +48,7 @@ The application's UI is divided into several panels:
 *   **Sidebar**: Contains all the control panels.
     *   **Toolbar**: Toggles for Inverse Kinematics, Relative Constraints, Joint Visibility, and Onion Skinning.
     *   **File Operations**: Buttons to save and load animation or pose files.
-    *   **Properties**: Sliders to adjust the length of each bone in the pose.
+    *   **Properties**: Sliders to adjust the length of each bone in the pose, with separate controls for left and right sides.
     *   **Animation**: Settings for animation duration, time display (seconds/frames), and loop mode.
 
 ## Keyboard Shortcuts

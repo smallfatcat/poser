@@ -26,13 +26,23 @@ export interface Pose {
     rightLowerLegAngle: number;
     rightFootAngle: number;
     shoulderWidth: number;
-    upperArmLength: number;
-    lowerArmLength: number;
-    handLength: number;
+    // Left side bone lengths
+    leftUpperArmLength: number;
+    leftLowerArmLength: number;
+    leftHandLength: number;
+    // Right side bone lengths
+    rightUpperArmLength: number;
+    rightLowerArmLength: number;
+    rightHandLength: number;
+    // Center bone lengths
     torsoLength: number;
-    upperLegLength: number;
-    lowerLegLength: number;
-    footLength: number;
+    leftUpperLegLength: number;
+    leftLowerLegLength: number;
+    leftFootLength: number;
+    rightUpperLegLength: number;
+    rightLowerLegLength: number;
+    rightFootLength: number;
+    scale: number;
     [key: string]: number | Vector2; // Keep flexible for interpolation
 }
 

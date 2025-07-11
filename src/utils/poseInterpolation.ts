@@ -45,10 +45,14 @@ export const interpolatePose = (poseA: Pose, poseB: Pose, t: number): Pose => {
         }
     });
     
-    // Interpolate segment lengths
+    // Always interpolate bone lengths independently of scale
+    // Scale only affects the final rendering size, not the bone proportions
     const lengthProps = [
-        'neckLength', 'headRadius', 'shoulderWidth', 'upperArmLength', 'lowerArmLength',
-        'handLength', 'torsoLength', 'upperLegLength', 'lowerLegLength', 'footLength'
+        'neckLength', 'headRadius', 'shoulderWidth', 
+        'leftUpperArmLength', 'leftLowerArmLength', 'leftHandLength',
+        'rightUpperArmLength', 'rightLowerArmLength', 'rightHandLength',
+        'torsoLength', 'leftUpperLegLength', 'leftLowerLegLength', 'leftFootLength',
+        'rightUpperLegLength', 'rightLowerLegLength', 'rightFootLength'
     ];
     
     lengthProps.forEach(prop => {
@@ -56,6 +60,11 @@ export const interpolatePose = (poseA: Pose, poseB: Pose, t: number): Pose => {
             interpolatedPose[prop] = interpolate(poseA[prop] as number, poseB[prop] as number, t);
         }
     });
+    
+    // Interpolate scale separately
+    const scaleA = poseA.scale || 1;
+    const scaleB = poseB.scale || 1;
+    interpolatedPose.scale = interpolate(scaleA, scaleB, t);
     
     return interpolatedPose;
 };
@@ -80,13 +89,23 @@ export const createStandingPose = (hipX = 300, hipY = 200): Pose => ({
     rightLowerLegAngle: 280,
     rightFootAngle: 0,
     shoulderWidth: 60,
-    upperArmLength: 50,
-    lowerArmLength: 45,
-    handLength: 25,
+    // Left side bone lengths
+    leftUpperArmLength: 50,
+    leftLowerArmLength: 45,
+    leftHandLength: 25,
+    // Right side bone lengths
+    rightUpperArmLength: 50,
+    rightLowerArmLength: 45,
+    rightHandLength: 25,
+    // Center bone lengths
     torsoLength: 80,
-    upperLegLength: 60,
-    lowerLegLength: 55,
-    footLength: 30
+    leftUpperLegLength: 60,
+    leftLowerLegLength: 55,
+    leftFootLength: 30,
+    rightUpperLegLength: 60,
+    rightLowerLegLength: 55,
+    rightFootLength: 30,
+    scale: 1
 });
 
 // Create a pose preset (walking pose)
@@ -109,13 +128,23 @@ export const createWalkingPose = (hipX = 300, hipY = 200): Pose => ({
     rightLowerLegAngle: 330,
     rightFootAngle: 0,
     shoulderWidth: 60,
-    upperArmLength: 50,
-    lowerArmLength: 45,
-    handLength: 25,
+    // Left side bone lengths
+    leftUpperArmLength: 50,
+    leftLowerArmLength: 45,
+    leftHandLength: 25,
+    // Right side bone lengths
+    rightUpperArmLength: 50,
+    rightLowerArmLength: 45,
+    rightHandLength: 25,
+    // Center bone lengths
     torsoLength: 80,
-    upperLegLength: 60,
-    lowerLegLength: 55,
-    footLength: 30
+    leftUpperLegLength: 60,
+    leftLowerLegLength: 55,
+    leftFootLength: 30,
+    rightUpperLegLength: 60,
+    rightLowerLegLength: 55,
+    rightFootLength: 30,
+    scale: 1
 });
 
 // Create a dynamic action pose based on the user's image reference
@@ -138,13 +167,23 @@ export const createDynamicActionPose = (hipX = 300, hipY = 220): Pose => ({
     rightLowerLegAngle: 274.8168901202079,
     rightFootAngle: 359.2944873428671,
     shoulderWidth: 60,
-    upperArmLength: 50,
-    lowerArmLength: 45,
-    handLength: 25,
+    // Left side bone lengths
+    leftUpperArmLength: 50,
+    leftLowerArmLength: 45,
+    leftHandLength: 25,
+    // Right side bone lengths
+    rightUpperArmLength: 50,
+    rightLowerArmLength: 45,
+    rightHandLength: 25,
+    // Center bone lengths
     torsoLength: 80,
-    upperLegLength: 60,
-    lowerLegLength: 55,
-    footLength: 30
+    leftUpperLegLength: 60,
+    leftLowerLegLength: 55,
+    leftFootLength: 30,
+    rightUpperLegLength: 60,
+    rightLowerLegLength: 55,
+    rightFootLength: 30,
+    scale: 1
 });
 
 // Create a pose preset (sitting pose)
@@ -167,13 +206,23 @@ export const createSittingPose = (hipX = 300, hipY = 280): Pose => ({
     rightLowerLegAngle: 45,
     rightFootAngle: 90,
     shoulderWidth: 60,
-    upperArmLength: 50,
-    lowerArmLength: 45,
-    handLength: 25,
+    // Left side bone lengths
+    leftUpperArmLength: 50,
+    leftLowerArmLength: 45,
+    leftHandLength: 25,
+    // Right side bone lengths
+    rightUpperArmLength: 50,
+    rightLowerArmLength: 45,
+    rightHandLength: 25,
+    // Center bone lengths
     torsoLength: 80,
-    upperLegLength: 60,
-    lowerLegLength: 55,
-    footLength: 30
+    leftUpperLegLength: 60,
+    leftLowerLegLength: 55,
+    leftFootLength: 30,
+    rightUpperLegLength: 60,
+    rightLowerLegLength: 55,
+    rightFootLength: 30,
+    scale: 1
 });
 
 // Easing functions for smooth animations

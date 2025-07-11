@@ -25,6 +25,7 @@ interface PoseCanvasProps {
     guidePositions?: { x: number; y: number };
     prevPose?: Pose | null;
     nextPose?: Pose | null;
+    currentPose?: Pose | null;
 }
 
 const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
@@ -47,6 +48,7 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
     guidePositions,
     prevPose,
     nextPose,
+    currentPose,
 }, ref) => {
     const internalRef = useRef<HTMLCanvasElement>(null);
     const canvasRef = (ref as React.RefObject<HTMLCanvasElement>) || internalRef;
@@ -72,10 +74,14 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
                 ikChains,
                 jointVisibility
             };
+            // Apply scale to head radius
+            const poseScale = currentPose?.scale || 1;
+            const scaledHeadRadius = headRadius * poseScale;
+            
             const styleConfig: StyleConfig = {
                 strokeColor,
                 strokeWidth,
-                headRadius,
+                headRadius: scaledHeadRadius,
                 jointVisibility,
                 width,
                 height,
@@ -131,6 +137,7 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
         guidePositions,
         prevPose,
         nextPose,
+        currentPose,
     ]);
 
     const canvasClasses = [

@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { PoseProvider, usePose } from './context/PoseContext';
+import { VideoProvider, useVideo } from './context/VideoContext';
 import { Toaster, toast } from 'react-hot-toast';
 import Sidebar from './components/layout/Sidebar';
 import MainContent from './components/layout/MainContent';
@@ -12,6 +13,7 @@ import PlayheadDisplay from './components/PlayheadDisplay';
 import FileOperationsPanel from './components/panels/FileOperationsPanel';
 import PropertiesPanel from './components/panels/PropertiesPanel';
 import AnimationPanel from './components/panels/AnimationPanel';
+import VideoPanel from './components/panels/VideoPanel';
 import useWindowSize from './hooks/useWindowSize';
 import { saveAs } from 'file-saver';
 import { Pose } from './types';
@@ -22,6 +24,7 @@ import { SettingsProvider, useSettings } from './context/SettingsContext';
 const App: React.FC = () => {
     const { width, height } = useWindowSize();
     const { currentPose, setPose } = usePose();
+    const { videoDuration } = useVideo();
     const {
         onionSkinning,
         loopMode,
@@ -30,6 +33,7 @@ const App: React.FC = () => {
     const [animationDuration, setAnimationDuration] = useState(5000);
     const [currentTime, setCurrentTime] = useState(0);
     const [guidePositions, setGuidePositions] = useState({ x: 5, y: 90 });
+    const [videoOpacity, setVideoOpacity] = useState(0.5);
 
     const {
         keyframes,
@@ -49,7 +53,7 @@ const App: React.FC = () => {
     const maxTime = Math.max(...keyframeTimes);
 
     const startTime = 0;
-    const endTime = Math.max(animationDuration, maxTime);
+    const endTime = Math.max(animationDuration, maxTime, videoDuration);
 
     const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
     const currentKeyframeIndex = sortedKeyframes.findIndex(k => k.time >= currentTime);
@@ -188,6 +192,10 @@ const App: React.FC = () => {
                 <Toolbar />
                 <InspectorPanel>
                     <FileOperationsPanel onSave={handleSave} onLoad={handleLoad} />
+                    <VideoPanel 
+                        videoOpacity={videoOpacity}
+                        onVideoOpacityChange={setVideoOpacity}
+                    />
                     <PropertiesPanel
                         boneLengths={currentPose}
                         onBoneLengthChange={(name: keyof Pose, value: number) => handleManualPoseChange({ ...currentPose, [name]: value })}
@@ -207,6 +215,8 @@ const App: React.FC = () => {
                         setGuidePositions={setGuidePositions}
                         prevPose={prevKeyframePose}
                         nextPose={nextKeyframePose}
+                        currentTime={currentTime}
+                        videoOpacity={videoOpacity}
                     />
                 </Viewport>
                 <Timeline>
@@ -233,7 +243,9 @@ const App: React.FC = () => {
 const Root = () => (
     <PoseProvider>
         <SettingsProvider>
-            <App />
+            <VideoProvider>
+                <App />
+            </VideoProvider>
         </SettingsProvider>
     </PoseProvider>
 );

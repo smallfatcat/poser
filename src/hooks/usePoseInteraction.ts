@@ -168,11 +168,20 @@ export const usePoseInteraction = ({
                 };
 
                 if (draggedJoint === 'hip') {
-                    newPose.hip = { x: targetPos.x, y: targetPos.y };
+                    // Hip is now always in original coordinates, no conversion needed
+                    newPose.hip = { 
+                        x: targetPos.x, 
+                        y: targetPos.y 
+                    };
                 } else if (draggedJoint === 'shoulder' && typeof newPose.hip === 'object') {
-                    const hipPos = newPose.hip;
-                    const dx = targetPos.x - hipPos.x;
-                    const dy = -(targetPos.y - hipPos.y);
+                    // Use scaled hip position for angle calculations (since targetPos is in scaled coordinates)
+                    const scale = newPose.scale || 1;
+                    const scaledHipPos = { 
+                        x: newPose.hip.x * scale, 
+                        y: newPose.hip.y * scale 
+                    };
+                    const dx = targetPos.x - scaledHipPos.x;
+                    const dy = -(targetPos.y - scaledHipPos.y);
                     let angle = Math.atan2(dy, dx) * (180 / Math.PI);
                     if (angle < 0) angle += 360;
                     angle = (angle - 90 + 360) % 360;
@@ -205,11 +214,20 @@ export const usePoseInteraction = ({
                 y: mousePos.y - (dragStartOffset ? dragStartOffset.y : 0)
             };
             if (draggedJoint === 'hip') {
-                newPose.hip = { x: targetPos.x, y: targetPos.y };
+                // Hip is now always in original coordinates, no conversion needed
+                newPose.hip = { 
+                    x: targetPos.x, 
+                    y: targetPos.y 
+                };
             } else if (draggedJoint === 'shoulder' && typeof newPose.hip === 'object') {
-                const hipPos = newPose.hip;
-                const dx = targetPos.x - hipPos.x;
-                const dy = -(targetPos.y - hipPos.y);
+                // Use scaled hip position for angle calculations (since targetPos is in scaled coordinates)
+                const scale = newPose.scale || 1;
+                const scaledHipPos = { 
+                    x: newPose.hip.x * scale, 
+                    y: newPose.hip.y * scale 
+                };
+                const dx = targetPos.x - scaledHipPos.x;
+                const dy = -(targetPos.y - scaledHipPos.y);
                 let angle = Math.atan2(dy, dx) * (180 / Math.PI);
                 if (angle < 0) angle += 360;
                 angle = (angle - 90 + 360) % 360;
