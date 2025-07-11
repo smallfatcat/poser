@@ -32,7 +32,7 @@ export const interpolatePose = (poseA: Pose, poseB: Pose, t: number): Pose => {
     
     // Interpolate all angles
     const angleProps = [
-        'torsoAngle', 'headAngle',
+        'torsoAngle', 'neckAngle', 'headAngle',
         'leftShoulderAngle', 'rightShoulderAngle',
         'leftUpperArmAngle', 'leftLowerArmAngle', 'leftHandAngle',
         'rightUpperArmAngle', 'rightLowerArmAngle', 'rightHandAngle',
@@ -77,6 +77,7 @@ export const interpolatePose = (poseA: Pose, poseB: Pose, t: number): Pose => {
 export const createStandingPose = (hipX = 300, hipY = 200): Pose => ({
     hip: { x: hipX, y: hipY },
     torsoAngle: 0,
+    neckAngle: 0,
     headAngle: 0,
     neckLength: 30,
     headRadius: 15,
@@ -125,6 +126,7 @@ export const createStandingPose = (hipX = 300, hipY = 200): Pose => ({
 export const createWalkingPose = (hipX = 300, hipY = 200): Pose => ({
     hip: { x: hipX, y: hipY },
     torsoAngle: 5,
+    neckAngle: 0,
     headAngle: -5,
     neckLength: 30,
     headRadius: 15,
@@ -173,6 +175,7 @@ export const createWalkingPose = (hipX = 300, hipY = 200): Pose => ({
 export const createDynamicActionPose = (hipX = 300, hipY = 220): Pose => ({
     hip: { x: hipX, y: hipY },
     torsoAngle: 354.39095320527827,
+    neckAngle: 0,
     headAngle: 352.87072944940746,
     neckLength: 30,
     headRadius: 15,
@@ -221,6 +224,7 @@ export const createDynamicActionPose = (hipX = 300, hipY = 220): Pose => ({
 export const createSittingPose = (hipX = 300, hipY = 280): Pose => ({
     hip: { x: hipX, y: hipY },
     torsoAngle: 0,
+    neckAngle: 0,
     headAngle: 0,
     neckLength: 30,
     headRadius: 15,
