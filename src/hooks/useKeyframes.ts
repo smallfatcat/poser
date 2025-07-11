@@ -68,22 +68,15 @@ export const useKeyframes = ({
             return;
         }
 
+        // Clamp the time to the animation duration
+        const clampedTime = Math.max(0, Math.min(time, animationDuration));
+
         const updatedKeyframes = kfs.map(k =>
-            k.id === id ? { ...k, time } : k
+            k.id === id ? { ...k, time: clampedTime } : k
         );
 
-        const sortedNewKeyframes = [...updatedKeyframes].sort((a, b) => a.time - b.time);
-        const newLastTime = sortedNewKeyframes[sortedNewKeyframes.length - 1].time;
-        
-        const sortedOldKeyframes = [...kfs].sort((a, b) => a.time - b.time);
-        const oldLastKeyframe = sortedOldKeyframes[sortedOldKeyframes.length - 1];
-
-        if ((oldLastKeyframe && oldLastKeyframe.id === id) || newLastTime > animationDuration) {
-            setAnimationDuration(newLastTime);
-        }
-
         setKeyframes(updatedKeyframes);
-        scrubToTime(time);
+        scrubToTime(clampedTime);
     };
 
     const handleAddKeyframe = useCallback((time: number): number | undefined => {
@@ -100,16 +93,14 @@ export const useKeyframes = ({
             }
 
             let newTime: number;
-            let didExtendDuration = false;
 
             if (sortedKeyframes.length === 1) {
                 newTime = animationDuration;
             } else {
                 const isLastFrame = selectedIndex === sortedKeyframes.length - 1;
                 if (isLastFrame) {
-                    newTime = animationDuration + 1000;
-                    setAnimationDuration(newTime);
-                    didExtendDuration = true;
+                    // Place the new keyframe at the end of the duration
+                    newTime = animationDuration;
                 } else {
                     const currentKeyframe = sortedKeyframes[selectedIndex];
                     const nextKeyframe = sortedKeyframes[selectedIndex + 1];
@@ -117,14 +108,13 @@ export const useKeyframes = ({
                 }
             }
 
-            const keyframeAtNewTime = kfs.find(k => k.time === newTime);
+            // Clamp the new time to the animation duration
+            newTime = Math.min(newTime, animationDuration);
+
+            const keyframeAtNewTime = kfs.find(k => Math.abs(k.time - newTime) < 10);
             if (keyframeAtNewTime) {
                 toast.error("A keyframe already exists at the calculated time. Please adjust.");
                 return;
-            }
-
-            if (!didExtendDuration && newTime > animationDuration) {
-                setAnimationDuration(newTime);
             }
 
             const newKeyframe: Keyframe = {
@@ -139,10 +129,8 @@ export const useKeyframes = ({
             return newTime;
 
         } else {
-            const newTime = time;
-            if (newTime > animationDuration) {
-                setAnimationDuration(newTime);
-            }
+            // Clamp the time to the animation duration
+            const newTime = Math.min(time, animationDuration);
             const newKeyframe: Keyframe = {
                 id: `keyframe_${Date.now()}`,
                 pose: JSON.parse(JSON.stringify(currentPose)),
@@ -153,7 +141,7 @@ export const useKeyframes = ({
             toast.success("Keyframe added!");
             return newTime;
         }
-    }, [currentPose, selectedKeyframeId, animationDuration, setAnimationDuration]);
+    }, [currentPose, selectedKeyframeId, animationDuration]);
 
     const handleSelectKeyframe = useCallback((id: string) => {
         const keyframe = keyframesRef.current.find(k => k.id === id);

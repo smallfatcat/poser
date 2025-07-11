@@ -49,12 +49,9 @@ const App: React.FC = () => {
         setAnimationDuration,
     });
 
-    const keyframeTimes = keyframes.length > 0 ? keyframes.map(k => k.time) : [0];
-    const maxTime = Math.max(...keyframeTimes);
-
     const startTime = 0;
-    // When loading animations, prioritize the animation duration over video duration
-    const endTime = Math.max(animationDuration, maxTime);
+    // Use the animation duration as the fixed end time for the timeline
+    const endTime = animationDuration;
 
     const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
     const currentKeyframeIndex = sortedKeyframes.findIndex(k => k.time >= currentTime);
@@ -82,13 +79,11 @@ const App: React.FC = () => {
     const addKeyframeAndAdjustTimeline = useCallback(() => {
         const newTime = handleAddKeyframe(currentTime);
         if (typeof newTime === 'number') {
-            const isExtending = newTime > endTime;
-            handleFrameChange(newTime, !isExtending);
-            if (isExtending) {
-                setAnimationTime(newTime);
-            }
+            // Clamp the new time to the duration
+            const clampedTime = Math.min(newTime, endTime);
+            handleFrameChange(clampedTime, true);
         }
-    }, [currentTime, endTime, handleAddKeyframe, handleFrameChange, setAnimationTime]);
+    }, [currentTime, endTime, handleAddKeyframe, handleFrameChange]);
 
     const handleScrub = useCallback((time: number) => {
         handleFrameChange(time, true);

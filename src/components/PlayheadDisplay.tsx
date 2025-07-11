@@ -104,10 +104,6 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
   };
 
   const handleKeyframeMouseDown = (e: React.MouseEvent<HTMLDivElement>, id: string) => {
-    const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
-    if (id === sortedKeyframes[0]?.id || id === sortedKeyframes[sortedKeyframes.length - 1]?.id) {
-        return; // Prevent dragging first and last keyframes
-    }
     e.stopPropagation();
     setDraggedKeyframeId(id);
   };
@@ -145,6 +141,7 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
         const newX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
         const percentage = newX / rect.width;
         const newTime = startTime + percentage * duration;
+        // The clamping is now handled in the useKeyframes hook
         onKeyframeTimeChange(draggedKeyframeId, newTime);
     };
 
