@@ -89,7 +89,9 @@ const App: React.FC = () => {
                 } else {
                     const prevKeyframes = sortedKeyframes.filter(k => k.time < currentTime);
                     if (prevKeyframes.length > 0) {
-                        handleScrub(prevKeyframes[prevKeyframes.length - 1].time);
+                        const prevKeyframe = prevKeyframes[prevKeyframes.length - 1];
+                        handleSelectKeyframe(prevKeyframe.id);
+                        handleScrub(prevKeyframe.time);
                     }
                 }
             } else if (e.key === 'ArrowRight') {
@@ -100,6 +102,7 @@ const App: React.FC = () => {
                 } else {
                     const nextKeyframe = sortedKeyframes.find(k => k.time > currentTime);
                     if (nextKeyframe) {
+                        handleSelectKeyframe(nextKeyframe.id);
                         handleScrub(nextKeyframe.time);
                     }
                 }
@@ -111,7 +114,7 @@ const App: React.FC = () => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [currentTime, handleScrub, sortedKeyframes]);
+    }, [currentTime, handleScrub, sortedKeyframes, handleSelectKeyframe]);
 
     const handleSave = () => {
         const animationData = {

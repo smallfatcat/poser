@@ -177,9 +177,8 @@ export const useKeyframes = ({
         if (keyframe && setPose) {
             setPose(keyframe.pose);
             setSelectedKeyframeId(id);
-            scrubToTime(keyframe.time);
         }
-    }, [setPose, scrubToTime]);
+    }, [setPose]);
 
     const handleManualPoseChange = (newPose: Pose) => {
         setPose(newPose);
