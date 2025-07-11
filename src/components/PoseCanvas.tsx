@@ -2,7 +2,8 @@ import React, { useEffect, useRef, forwardRef, memo } from 'react';
 import { ikChains } from '../constants/joints';
 import { drawPose, drawJoints } from '../utils/drawing';
 import styles from './PoseRenderer.module.css';
-import { PoseCoordinates, DrawConfig, StyleConfig } from '../types';
+import { PoseCoordinates, DrawConfig, StyleConfig, Pose } from '../types';
+import { poseToCoordinates } from '../utils/poseAngleToCoordinates';
 
 interface PoseCanvasProps {
     width: number;
@@ -21,6 +22,9 @@ interface PoseCanvasProps {
     className: string;
     style: React.CSSProperties;
     shouldClear?: boolean;
+    guidePositions?: { x: number; y: number };
+    prevPose?: Pose | null;
+    nextPose?: Pose | null;
 }
 
 const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
@@ -40,6 +44,9 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
     className,
     style,
     shouldClear = true,
+    guidePositions,
+    prevPose,
+    nextPose,
 }, ref) => {
     const internalRef = useRef<HTMLCanvasElement>(null);
     const canvasRef = (ref as React.RefObject<HTMLCanvasElement>) || internalRef;
@@ -77,7 +84,33 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
             if(shouldClear) {
                 ctx.clearRect(0, 0, width, height);
             }
+            
+            const ghostStyle = { ...styleConfig, strokeColor: 'rgba(0, 255, 0, 0.2)' };
+            if (prevPose) {
+                drawPose(ctx, poseToCoordinates(prevPose), ghostStyle, drawConfig);
+            }
+            if (nextPose) {
+                drawPose(ctx, poseToCoordinates(nextPose), ghostStyle, drawConfig);
+            }
+
             drawPose(ctx, poseCoordinates, styleConfig, drawConfig);
+
+            if (guidePositions) {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+                ctx.lineWidth = 1;
+                // Draw vertical guide
+                ctx.beginPath();
+                ctx.moveTo((guidePositions.x / 100) * width, 0);
+                ctx.lineTo((guidePositions.x / 100) * width, height);
+                ctx.stroke();
+                // Draw horizontal guide
+                ctx.beginPath();
+                ctx.moveTo(0, (guidePositions.y / 100) * height);
+                ctx.lineTo(width, (guidePositions.y / 100) * height);
+                ctx.stroke();
+                ctx.restore();
+            }
         }
     }, [
         poseCoordinates, 
@@ -94,7 +127,10 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
         ikChains,
         width,
         height,
-        shouldClear
+        shouldClear,
+        guidePositions,
+        prevPose,
+        nextPose,
     ]);
 
     const canvasClasses = [

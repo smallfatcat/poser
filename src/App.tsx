@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { PoseProvider, usePose } from './context/PoseContext';
 import { Toaster, toast } from 'react-hot-toast';
 import Sidebar from './components/layout/Sidebar';
@@ -25,8 +25,10 @@ const App: React.FC = () => {
     const { currentPose, setPose } = usePose();
     const [animationDuration, setAnimationDuration] = useState(5000);
     const [currentTime, setCurrentTime] = useState(0);
+    const [guidePositions, setGuidePositions] = useState({ x: 5, y: 90 });
     const [timeDisplayMode, setTimeDisplayMode] = useState<'seconds' | 'frames'>('seconds');
     const [loopMode, setLoopMode] = useState<LoopMode>('none');
+    const [onionSkinning, setOnionSkinning] = useState(false);
 
     const toggleLoopMode = () => {
         setLoopMode(prev => {
@@ -64,6 +66,12 @@ const App: React.FC = () => {
     const startTime = 0;
     const endTime = Math.max(animationDuration, maxTime);
 
+    const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
+    const currentKeyframeIndex = sortedKeyframes.findIndex(k => k.time >= currentTime);
+    
+    const prevKeyframePose = onionSkinning && currentKeyframeIndex > 0 ? sortedKeyframes[currentKeyframeIndex - 1].pose : null;
+    const nextKeyframePose = onionSkinning && currentKeyframeIndex !== -1 && currentKeyframeIndex < sortedKeyframes.length - 1 ? sortedKeyframes[currentKeyframeIndex + 1].pose : null;
+
     const handleFrameChange = useCallback((time: number) => {
         const clampedTime = Math.max(startTime, Math.min(time, endTime));
         setCurrentTime(clampedTime);
@@ -85,6 +93,40 @@ const App: React.FC = () => {
         handleFrameChange(time);
         setAnimationTime(time);
     }, [handleFrameChange, setAnimationTime]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    const frameDuration = 1000 / 60; // 60 FPS
+                    handleScrub(currentTime - frameDuration);
+                } else {
+                    const prevKeyframes = sortedKeyframes.filter(k => k.time < currentTime);
+                    if (prevKeyframes.length > 0) {
+                        handleScrub(prevKeyframes[prevKeyframes.length - 1].time);
+                    }
+                }
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    const frameDuration = 1000 / 60; // 60 FPS
+                    handleScrub(currentTime + frameDuration);
+                } else {
+                    const nextKeyframe = sortedKeyframes.find(k => k.time > currentTime);
+                    if (nextKeyframe) {
+                        handleScrub(nextKeyframe.time);
+                    }
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [currentTime, handleScrub, sortedKeyframes]);
 
     const toggleJointVisibility = () => {
         const visibilities: ('always' | 'hover' | 'never')[] = ['hover', 'always', 'never'];
@@ -164,6 +206,8 @@ const App: React.FC = () => {
                     jointVisibility={jointVisibility}
                     toggleJointVisibility={toggleJointVisibility}
                     getJointVisibilityText={getJointVisibilityText}
+                    onionSkinning={onionSkinning}
+                    setOnionSkinning={setOnionSkinning}
                 />
                 <InspectorPanel>
                     <FileOperationsPanel onSave={handleSave} onLoad={handleLoad} />
@@ -190,6 +234,10 @@ const App: React.FC = () => {
                         useRelativeConstraints={useRelativeConstraints}
                         useInverseKinematics={useInverseKinematics}
                         jointVisibility={jointVisibility}
+                        guidePositions={guidePositions}
+                        setGuidePositions={setGuidePositions}
+                        prevPose={prevKeyframePose}
+                        nextPose={nextKeyframePose}
                     />
                 </Viewport>
                 <Timeline>
@@ -197,7 +245,12 @@ const App: React.FC = () => {
                         keyframes={keyframes}
                         selectedKeyframeId={selectedKeyframeId}
                         onKeyframeSelect={handleSelectKeyframe}
-                        onAddKeyframe={() => handleAddKeyframe(currentTime)}
+                        onAddKeyframe={() => {
+                            const newTime = handleAddKeyframe(currentTime);
+                            if (typeof newTime === 'number') {
+                                handleScrub(newTime);
+                            }
+                        }}
                         currentTime={currentTime}
                         startTime={0}
                         endTime={endTime}

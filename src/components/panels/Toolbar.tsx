@@ -8,6 +8,8 @@ interface ToolbarProps {
     jointVisibility: 'always' | 'hover' | 'never';
     toggleJointVisibility: () => void;
     getJointVisibilityText: () => string;
+    onionSkinning: boolean;
+    setOnionSkinning: (value: boolean | ((prev: boolean) => boolean)) => void;
 }
 
 const Toolbar: React.FC<ToolbarProps> = memo(({
@@ -18,6 +20,8 @@ const Toolbar: React.FC<ToolbarProps> = memo(({
     jointVisibility,
     toggleJointVisibility,
     getJointVisibilityText,
+    onionSkinning,
+    setOnionSkinning,
 }) => {
     return (
         <div className="group">
@@ -40,6 +44,12 @@ const Toolbar: React.FC<ToolbarProps> = memo(({
                     className="btn"
                 >
                     {getJointVisibilityText()}
+                </button>
+                <button
+                    onClick={() => setOnionSkinning(!onionSkinning)}
+                    className={`btn ${onionSkinning ? 'active' : ''}`}
+                >
+                    Onion Skin
                 </button>
             </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState } from 'react';
+import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { usePoseInteraction } from '../hooks/usePoseInteraction';
 import PoseCanvas from './PoseCanvas';
 import { usePose } from '../context/PoseContext';
@@ -20,6 +20,10 @@ interface PoseRendererProps {
     useRelativeConstraints: boolean;
     useInverseKinematics: boolean;
     jointVisibility: 'always' | 'hover' | 'never';
+    guidePositions: { x: number; y: number };
+    setGuidePositions: (positions: { x: number; y: number }) => void;
+    prevPose?: Pose | null;
+    nextPose?: Pose | null;
 }
 
 const PoseRenderer: React.FC<PoseRendererProps> = ({ 
@@ -36,6 +40,10 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
     useRelativeConstraints,
     useInverseKinematics,
     jointVisibility,
+    guidePositions,
+    setGuidePositions,
+    prevPose,
+    nextPose,
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [excludedJoints, setExcludedJoints] = useState(new Set<string>());
@@ -56,6 +64,10 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
         useInverseKinematics,
         excludedJoints,
         useRelativeConstraints,
+        guidePositions,
+        setGuidePositions,
+        width,
+        height,
     });
     
     // Handle ctrl-click to exclude joints
@@ -182,6 +194,9 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
                     excludedJoints={excludedJoints}
                     className={className}
                     style={style}
+                    guidePositions={guidePositions}
+                    prevPose={prevPose}
+                    nextPose={nextPose}
                 />
                 <div className={styles.version}>
                     v{__APP_VERSION__}

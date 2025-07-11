@@ -12,6 +12,10 @@ interface UsePoseInteractionProps {
     useInverseKinematics: boolean;
     excludedJoints: Set<string>;
     useRelativeConstraints: boolean;
+    guidePositions: { x: number; y: number };
+    setGuidePositions: (positions: { x: number; y: number }) => void;
+    width: number;
+    height: number;
 }
 
 interface UsePoseInteractionReturn {
@@ -32,9 +36,14 @@ export const usePoseInteraction = ({
     useInverseKinematics,
     excludedJoints,
     useRelativeConstraints,
+    guidePositions,
+    setGuidePositions,
+    width,
+    height,
 }: UsePoseInteractionProps): UsePoseInteractionReturn => {
     const [currentPose, setCurrentPose] = useState<Pose>(pose);
     const [draggedJoint, setDraggedJoint] = useState<string | null>(null);
+    const [draggedGuide, setDraggedGuide] = useState<'x' | 'y' | null>(null);
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [dragStartPose, setDragStartPose] = useState<Pose | null>(null);
     const [dragStartOffset, setDragStartOffset] = useState<Vector2 | null>(null);
@@ -90,25 +99,46 @@ export const usePoseInteraction = ({
         
         if (jointName) {
             if (e instanceof MouseEvent && e.ctrlKey) {
-                // This logic will be handled in the component
                 return;
             }
-
             setDraggedJoint(jointName);
             setIsDragging(true);
             setDragStartPose(currentPose);
-
             const jointPos = (poseCoordinates as any)[jointName];
             const mousePos = getEventPos(e);
-            
             const dx = mousePos.x - jointPos.x;
             const dy = mousePos.y - jointPos.y;
             setDragStartOffset({ x: dx, y: dy });
+            return;
         }
-    }, [draggable, getEventPos, getJointAtPosition, currentPose, poseCoordinates]);
+
+        const guideXPos = (guidePositions.x / 100) * width;
+        const guideYPos = (guidePositions.y / 100) * height;
+        const guideTolerance = 5;
+
+        if (Math.abs(pos.x - guideXPos) < guideTolerance) {
+            setDraggedGuide('x');
+        } else if (Math.abs(pos.y - guideYPos) < guideTolerance) {
+            setDraggedGuide('y');
+        }
+    }, [draggable, getEventPos, getJointAtPosition, currentPose, poseCoordinates, guidePositions, width, height]);
 
     const handleDragMove = useCallback((e: MouseEvent | TouchEvent) => {
-        if (!draggable || !isDragging || !draggedJoint) return;
+        if (!draggable) return;
+
+        if (draggedGuide) {
+            const pos = getEventPos(e);
+            if (draggedGuide === 'x') {
+                const newX = (pos.x / width) * 100;
+                setGuidePositions({ ...guidePositions, x: Math.max(0, Math.min(100, newX)) });
+            } else {
+                const newY = (pos.y / height) * 100;
+                setGuidePositions({ ...guidePositions, y: Math.max(0, Math.min(100, newY)) });
+            }
+            return;
+        }
+
+        if (!isDragging || !draggedJoint) return;
 
         e.preventDefault();
         const mousePos = getEventPos(e);
@@ -223,13 +253,19 @@ export const usePoseInteraction = ({
         currentPose,
         excludedJoints,
         useRelativeConstraints,
-        dragStartOffset
+        dragStartOffset,
+        draggedGuide,
+        guidePositions,
+        setGuidePositions,
+        width,
+        height,
     ]);
 
     const handleDragEnd = useCallback(() => {
         setIsDragging(false);
         setDraggedJoint(null);
         setDragStartPose(null);
+        setDraggedGuide(null);
     }, []);
 
     useEffect(() => {
@@ -237,49 +273,76 @@ export const usePoseInteraction = ({
         if (!canvas || !draggable) return;
 
         const handleHover = (e: MouseEvent) => {
-            if (isDragging) {
+            if (isDragging || draggedGuide) {
                 setHoveredJoint(null);
                 return;
             }
             const mousePos = getEventPos(e);
             const jointName = getJointAtPosition(mousePos.x, mousePos.y);
             setHoveredJoint(jointName);
+
+            const guideXPos = (guidePositions.x / 100) * width;
+            const guideYPos = (guidePositions.y / 100) * height;
+            const guideTolerance = 5;
+
+            if (jointName) {
+                canvas.style.cursor = 'grab';
+            } else if (Math.abs(mousePos.x - guideXPos) < guideTolerance) {
+                canvas.style.cursor = 'ew-resize';
+            } else if (Math.abs(mousePos.y - guideYPos) < guideTolerance) {
+                canvas.style.cursor = 'ns-resize';
+            } else {
+                canvas.style.cursor = 'default';
+            }
         };
         
         const handleLeave = () => {
             setHoveredJoint(null);
+            canvas.style.cursor = 'default';
         };
 
         const handleDragStartTyped = (e: MouseEvent | TouchEvent) => handleDragStart(e);
         const handleDragMoveTyped = (e: MouseEvent | TouchEvent) => handleDragMove(e);
 
         canvas.addEventListener('mousedown', handleDragStartTyped);
-        canvas.addEventListener('mousemove', handleDragMoveTyped);
-        canvas.addEventListener('mousemove', handleHover);
-        canvas.addEventListener('mouseup', handleDragEnd);
-        canvas.addEventListener('mouseleave', handleDragEnd);
-        canvas.addEventListener('mouseleave', handleLeave);
-
         canvas.addEventListener('touchstart', handleDragStartTyped, { passive: false });
-        canvas.addEventListener('touchmove', handleDragMoveTyped, { passive: false });
-        canvas.addEventListener('touchend', handleDragEnd);
-        canvas.addEventListener('touchcancel', handleDragEnd);
+        
+        window.addEventListener('mousemove', handleDragMoveTyped);
+        window.addEventListener('touchmove', handleDragMoveTyped, { passive: false });
 
+        window.addEventListener('mouseup', handleDragEnd);
+        window.addEventListener('touchend', handleDragEnd);
+
+        canvas.addEventListener('mousemove', handleHover);
+        canvas.addEventListener('mouseleave', handleLeave);
 
         return () => {
             canvas.removeEventListener('mousedown', handleDragStartTyped);
-            canvas.removeEventListener('mousemove', handleDragMoveTyped);
-            canvas.removeEventListener('mousemove', handleHover);
-            canvas.removeEventListener('mouseup', handleDragEnd);
-            canvas.removeEventListener('mouseleave', handleDragEnd);
-            canvas.removeEventListener('mouseleave', handleLeave);
-            
             canvas.removeEventListener('touchstart', handleDragStartTyped);
-            canvas.removeEventListener('touchmove', handleDragMoveTyped);
-            canvas.removeEventListener('touchend', handleDragEnd);
-            canvas.removeEventListener('touchcancel', handleDragEnd);
+
+            window.removeEventListener('mousemove', handleDragMoveTyped);
+            window.removeEventListener('touchmove', handleDragMoveTyped);
+
+            window.removeEventListener('mouseup', handleDragEnd);
+            window.removeEventListener('touchend', handleDragEnd);
+
+            canvas.removeEventListener('mousemove', handleHover);
+            canvas.removeEventListener('mouseleave', handleLeave);
         };
-    }, [draggable, handleDragStart, handleDragMove, handleDragEnd, isDragging, getEventPos, getJointAtPosition]);
+    }, [
+        canvasRef, 
+        draggable, 
+        getEventPos, 
+        handleDragStart, 
+        handleDragMove, 
+        handleDragEnd, 
+        getJointAtPosition, 
+        isDragging,
+        draggedGuide,
+        guidePositions,
+        width,
+        height
+    ]);
 
     return {
         draggedJoint,
