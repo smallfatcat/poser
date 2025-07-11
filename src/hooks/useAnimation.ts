@@ -30,17 +30,17 @@ export const useAnimation = ({ animationDuration, onFrame, loop, pingPong }: Use
 
     useEffect(() => {
         if (isPlaying) {
-            let startTime = Date.now() - (isReversing ? animationDuration - currentTime : currentTime);
+            let startTime = performance.now() - (isReversing ? animationDuration - currentTime : currentTime);
 
             const animate = () => {
-                const elapsed = Date.now() - startTime;
+                const elapsed = performance.now() - startTime;
                 let newTime = isReversing ? animationDuration - elapsed : elapsed;
 
                 if (isReversing) {
                     if (newTime <= 0) {
                         if (loop) {
                             setIsReversing(false);
-                            startTime = Date.now(); 
+                            startTime = performance.now(); 
                             onFrame(0);
                         } else {
                             setIsPlaying(false);
@@ -55,11 +55,11 @@ export const useAnimation = ({ animationDuration, onFrame, loop, pingPong }: Use
                         if (loop) {
                             if (pingPong) {
                                 setIsReversing(true);
-                                startTime = Date.now();
+                                startTime = performance.now();
                                 onFrame(animationDuration);
                             } else {
                                 setCurrentTime(0);
-                                startTime = Date.now();
+                                startTime = performance.now();
                                 onFrame(0);
                             }
                         } else {

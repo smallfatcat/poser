@@ -55,6 +55,8 @@ export const VideoProvider: React.FC<VideoProviderProps> = ({ children }) => {
             videoRef.current.crossOrigin = 'anonymous';
             videoRef.current.muted = true;
             videoRef.current.loop = false;
+            videoRef.current.preload = 'auto';
+            videoRef.current.playsInline = true;
         }
 
         videoRef.current.src = url;
@@ -91,7 +93,10 @@ export const VideoProvider: React.FC<VideoProviderProps> = ({ children }) => {
 
     const setVideoTime = useCallback((time: number) => {
         if (videoRef.current && isVideoLoaded) {
-            videoRef.current.currentTime = time / 1000; // Convert from milliseconds to seconds
+            const videoTime = time / 1000; // Convert from milliseconds to seconds
+            // Ensure the time is within valid bounds
+            const clampedTime = Math.max(0, Math.min(videoTime, videoRef.current.duration));
+            videoRef.current.currentTime = clampedTime;
         }
     }, [isVideoLoaded]);
 

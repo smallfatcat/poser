@@ -16,7 +16,8 @@ const VideoBackground: React.FC<VideoBackgroundProps> = ({
 }) => {
     const { videoElement, isVideoLoaded, videoDuration } = useVideo();
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [isRendering, setIsRendering] = useState(false);
+    const [isSeeking, setIsSeeking] = useState(false);
+    const [videoFrameRate, setVideoFrameRate] = useState(30); // Default to 30fps
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -27,9 +28,7 @@ const VideoBackground: React.FC<VideoBackgroundProps> = ({
         }
 
         const renderFrame = () => {
-            if (!videoElement || !ctx || isRendering) return;
-            
-            setIsRendering(true);
+            if (!videoElement || !ctx) return;
             
             try {
                 // Clear canvas
@@ -71,42 +70,89 @@ const VideoBackground: React.FC<VideoBackgroundProps> = ({
                 ctx.globalAlpha = 1.0;
             } catch (error) {
                 console.error('Error rendering video frame:', error);
-            } finally {
-                setIsRendering(false);
             }
         };
 
-        // Render initial frame
-        renderFrame();
+        let callbackId: number;
 
-        // Set up animation frame loop for smooth playback
-        let animationId: number;
-        const animate = () => {
+        if ('requestVideoFrameCallback' in videoElement) {
+            const onFrame: VideoFrameRequestCallback = (now, metadata) => {
+                renderFrame();
+                // Re-register for the next frame if the video is not paused.
+                // When paused, we rely on the currentTime effect to trigger a redraw.
+                if (!videoElement.paused) {
+                    callbackId = videoElement.requestVideoFrameCallback(onFrame);
+                }
+            };
+            callbackId = videoElement.requestVideoFrameCallback(onFrame);
+            // Also render a frame immediately in case the video is paused
             renderFrame();
-            animationId = requestAnimationFrame(animate);
-        };
-        
-        if (videoElement.readyState >= 2) { // HAVE_CURRENT_DATA
-            animate();
+        } else {
+            // Fallback for browsers that don't support it
+            const animate = () => {
+                renderFrame();
+                callbackId = requestAnimationFrame(animate);
+            };
+            callbackId = requestAnimationFrame(animate);
         }
 
         return () => {
-            if (animationId) {
-                cancelAnimationFrame(animationId);
+            if ('requestVideoFrameCallback' in videoElement && videoElement.cancelVideoFrameCallback) {
+                videoElement.cancelVideoFrameCallback(callbackId);
+            } else {
+                cancelAnimationFrame(callbackId);
             }
         };
-    }, [videoElement, isVideoLoaded, width, height, opacity, isRendering]);
+    }, [videoElement, isVideoLoaded, width, height, opacity, currentTime]);
+
+    // Handle video seeking events and detect frame rate
+    useEffect(() => {
+        if (!videoElement) return;
+
+        const handleSeeking = () => setIsSeeking(true);
+        const handleSeeked = () => setIsSeeking(false);
+        const handleLoadedMetadata = () => {
+            // Try to detect frame rate from video properties
+            // This is a rough estimation - browsers don't always provide accurate frame rate info
+            if (videoElement.videoWidth && videoElement.videoHeight) {
+                // For most web videos, assume 30fps unless we can detect otherwise
+                setVideoFrameRate(30);
+            }
+        };
+
+        videoElement.addEventListener('seeking', handleSeeking);
+        videoElement.addEventListener('seeked', handleSeeked);
+        videoElement.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+        return () => {
+            videoElement.removeEventListener('seeking', handleSeeking);
+            videoElement.removeEventListener('seeked', handleSeeked);
+            videoElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        };
+    }, [videoElement]);
 
     // Sync video time with timeline
     useEffect(() => {
-        if (videoElement && isVideoLoaded && videoDuration > 0) {
+        if (videoElement && isVideoLoaded && videoDuration > 0 && videoElement.duration > 0 && !isSeeking) {
             // Calculate video time based on current timeline time
-            const videoTime = (currentTime / videoDuration) * videoElement.duration;
-            if (Math.abs(videoElement.currentTime - videoTime) > 0.1) {
-                videoElement.currentTime = videoTime;
+            // videoDuration here is the animation duration, not the video duration
+            const videoTime = Math.max(0, Math.min((currentTime / videoDuration) * videoElement.duration, videoElement.duration));
+            
+            // Round to the nearest frame boundary for more precise synchronization
+            const frameDuration = 1 / videoFrameRate;
+            const roundedVideoTime = Math.round(videoTime / frameDuration) * frameDuration;
+            
+            // Use a much smaller tolerance for frame-perfect synchronization
+            // Use the video's frame rate to determine tolerance
+            const tolerance = 1 / videoFrameRate;
+            
+            // Only seek if the difference is significant enough to warrant a seek
+            if (Math.abs(videoElement.currentTime - roundedVideoTime) > tolerance) {
+                // Use a more precise seeking method
+                videoElement.currentTime = roundedVideoTime;
             }
         }
-    }, [currentTime, videoElement, isVideoLoaded, videoDuration]);
+    }, [currentTime, videoElement, isVideoLoaded, videoDuration, isSeeking, videoFrameRate]);
 
     if (!isVideoLoaded) {
         return null;

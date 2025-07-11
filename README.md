@@ -15,6 +15,7 @@ A React-based application for creating and animating 2D stick figures with a key
 - **Joint Visibility Control**: Toggle the visibility of joints for a cleaner look.
 - 🧅 **Onion Skinning**: View previous and next keyframes as ghost poses for better animation reference.
 - 🔄 **Loop Modes**: Choose between no loop, regular loop, or ping-pong animation modes.
+- 🎥 **Video Background Support**: Import video files as background reference with frame-perfect synchronization.
 - ⌨️ **Keyboard Shortcuts**: Navigate between keyframes and add keyframes with keyboard controls.
 - ⚡ **Built with TypeScript & Vite**: A modern, fast, and type-safe development environment.
 
@@ -48,6 +49,7 @@ The application's UI is divided into several panels:
 *   **Sidebar**: Contains all the control panels.
     *   **Toolbar**: Toggles for Inverse Kinematics, Relative Constraints, Joint Visibility, and Onion Skinning.
     *   **File Operations**: Buttons to save and load animation or pose files.
+    *   **Video Panel**: Import video files as background reference with opacity controls.
     *   **Properties**: Sliders to adjust the length of each bone in the pose, with separate controls for left and right sides.
     *   **Animation**: Settings for animation duration, time display (seconds/frames), and loop mode.
 
@@ -135,9 +137,19 @@ This structure allows for a flexible and detailed representation of the pose and
 
 The entire application is built with TypeScript. All components and data structures are fully typed, providing excellent developer experience with autocomplete and type safety.
 
+## Video Background Features
+
+The application supports importing video files as background reference for animation:
+
+- **Frame-Perfect Synchronization**: Video playback is synchronized with the animation timeline using `requestVideoFrameCallback` for precise frame alignment.
+- **Smooth Scrubbing**: Both forward and backward scrubbing through the timeline maintains perfect video frame synchronization.
+- **Opacity Controls**: Adjust video opacity to better see your animation over the reference video.
+- **Aspect Ratio Handling**: Videos are automatically scaled to fit the canvas while maintaining their original aspect ratio.
+- **Fallback Support**: Uses `requestAnimationFrame` as a fallback for browsers that don't support `requestVideoFrameCallback`.
+
 ## Browser Support
 
-- Chrome 60+
+- Chrome 60+ (with `requestVideoFrameCallback` support in newer versions)
 - Firefox 55+
 - Safari 12+
 - Edge 79+ 
