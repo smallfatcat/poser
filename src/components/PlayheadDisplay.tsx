@@ -3,6 +3,7 @@ import styles from './PlayheadDisplay.module.css';
 import { Pose } from '../types';
 import PoseCanvas from './PoseCanvas';
 import { poseToCoordinates } from '../utils/poseAngleToCoordinates';
+import { useSettings } from '../context/SettingsContext';
 
 export interface Keyframe {
   id: string;
@@ -22,7 +23,6 @@ interface PlayheadDisplayProps {
   onKeyframeTimeChange: (id: string, time: number) => void;
   onPlay: () => void;
   isPlaying: boolean;
-  timeDisplayMode: 'seconds' | 'frames';
   setAnimationDuration: (duration: number) => void;
 }
 
@@ -38,9 +38,9 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
   onKeyframeTimeChange,
   onPlay,
   isPlaying,
-  timeDisplayMode,
   setAnimationDuration,
 }) => {
+  const { timeDisplayMode } = useSettings();
   const [isDraggingPlayhead, setIsDraggingPlayhead] = useState(false);
   const [draggedKeyframeId, setDraggedKeyframeId] = useState<string | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);

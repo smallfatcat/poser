@@ -1,28 +1,18 @@
 import React, { memo } from 'react';
+import { useSettings } from '../../context/SettingsContext';
 
-interface ToolbarProps {
-    useRelativeConstraints: boolean;
-    setUseRelativeConstraints: (value: boolean | ((prev: boolean) => boolean)) => void;
-    useInverseKinematics: boolean;
-    setUseInverseKinematics: (value: boolean | ((prev: boolean) => boolean)) => void;
-    jointVisibility: 'always' | 'hover' | 'never';
-    toggleJointVisibility: () => void;
-    getJointVisibilityText: () => string;
-    onionSkinning: boolean;
-    setOnionSkinning: (value: boolean | ((prev: boolean) => boolean)) => void;
-}
+const Toolbar: React.FC = memo(() => {
+    const {
+        useRelativeConstraints,
+        setUseRelativeConstraints,
+        useInverseKinematics,
+        setUseInverseKinematics,
+        toggleJointVisibility,
+        getJointVisibilityText,
+        onionSkinning,
+        setOnionSkinning,
+    } = useSettings();
 
-const Toolbar: React.FC<ToolbarProps> = memo(({
-    useRelativeConstraints,
-    setUseRelativeConstraints,
-    useInverseKinematics,
-    setUseInverseKinematics,
-    jointVisibility,
-    toggleJointVisibility,
-    getJointVisibilityText,
-    onionSkinning,
-    setOnionSkinning,
-}) => {
     return (
         <div className="group">
             <h3 className="group-title">Interaction Settings</h3>

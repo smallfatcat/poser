@@ -5,6 +5,7 @@ import { usePose } from '../context/PoseContext';
 import styles from './PoseRenderer.module.css';
 import { toast } from 'react-hot-toast';
 import { Pose } from '../types';
+import { useSettings } from '../context/SettingsContext';
 
 interface PoseRendererProps {
     width?: number;
@@ -17,9 +18,6 @@ interface PoseRendererProps {
     draggable?: boolean;
     pose: Pose;
     onPoseChange: (pose: Pose) => void;
-    useRelativeConstraints: boolean;
-    useInverseKinematics: boolean;
-    jointVisibility: 'always' | 'hover' | 'never';
     guidePositions: { x: number; y: number };
     setGuidePositions: (positions: { x: number; y: number }) => void;
     prevPose?: Pose | null;
@@ -37,14 +35,16 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
     draggable = false,
     pose,
     onPoseChange,
-    useRelativeConstraints,
-    useInverseKinematics,
-    jointVisibility,
     guidePositions,
     setGuidePositions,
     prevPose,
     nextPose,
 }) => {
+    const {
+        useRelativeConstraints,
+        useInverseKinematics,
+        jointVisibility,
+    } = useSettings();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [excludedJoints, setExcludedJoints] = useState(new Set<string>());
 

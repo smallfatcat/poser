@@ -19,10 +19,13 @@ export const useKeyframes = ({
     const [selectedKeyframeId, setSelectedKeyframeId] = useState<string | undefined>(undefined);
     const lastDurationRef = useRef(animationDuration);
 
+    const keyframesRef = useRef(keyframes);
+    keyframesRef.current = keyframes;
+
     useEffect(() => {
         if (lastDurationRef.current !== animationDuration && lastDurationRef.current > 0) {
             const ratio = animationDuration / lastDurationRef.current;
-            const updatedKeyframes = keyframes.map(kf => ({
+            const updatedKeyframes = keyframesRef.current.map(kf => ({
                 ...kf,
                 time: Math.round(kf.time * ratio)
             }));
@@ -41,15 +44,16 @@ export const useKeyframes = ({
             setKeyframes([initialKeyframe]);
             setSelectedKeyframeId(initialKeyframe.id);
         }
-    }, [keyframes, currentPose]);
+    }, [currentPose]);
 
     const scrubToTime = useCallback((time: number) => {
-        if (keyframes.length < 2) {
-            if (keyframes.length === 1) setPose(keyframes[0].pose);
+        const kfs = keyframesRef.current;
+        if (kfs.length < 2) {
+            if (kfs.length === 1) setPose(kfs[0].pose);
             return;
         }
 
-        const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
+        const sortedKeyframes = [...kfs].sort((a, b) => a.time - b.time);
 
         const prevKeyframe = sortedKeyframes.slice().reverse().find(k => k.time <= time);
         const nextKeyframe = sortedKeyframes.find(k => k.time >= time);
@@ -68,22 +72,23 @@ export const useKeyframes = ({
         } else if (nextKeyframe) {
             setPose(nextKeyframe.pose);
         }
-    }, [keyframes, setPose]);
+    }, [setPose]);
 
     const handleKeyframeTimeChange = (id: string, time: number) => {
-        const otherKeyframes = keyframes.filter(k => k.id !== id);
+        const kfs = keyframesRef.current;
+        const otherKeyframes = kfs.filter(k => k.id !== id);
         if (otherKeyframes.some(k => Math.abs(k.time - time) < 10)) { // 10ms threshold
             return;
         }
 
-        const updatedKeyframes = keyframes.map(k =>
+        const updatedKeyframes = kfs.map(k =>
             k.id === id ? { ...k, time } : k
         );
 
         const sortedNewKeyframes = [...updatedKeyframes].sort((a, b) => a.time - b.time);
         const newLastTime = sortedNewKeyframes[sortedNewKeyframes.length - 1].time;
         
-        const sortedOldKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
+        const sortedOldKeyframes = [...kfs].sort((a, b) => a.time - b.time);
         const oldLastKeyframe = sortedOldKeyframes[sortedOldKeyframes.length - 1];
 
         if ((oldLastKeyframe && oldLastKeyframe.id === id) || newLastTime > animationDuration) {
@@ -96,10 +101,11 @@ export const useKeyframes = ({
     };
 
     const handleAddKeyframe = useCallback((time: number): number | undefined => {
-        const keyframeAtCurrentTime = keyframes.find(k => Math.abs(k.time - time) < 10);
+        const kfs = keyframesRef.current;
+        const keyframeAtCurrentTime = kfs.find(k => Math.abs(k.time - time) < 10);
 
         if (keyframeAtCurrentTime) {
-            const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
+            const sortedKeyframes = [...kfs].sort((a, b) => a.time - b.time);
             const selectedIndex = selectedKeyframeId ? sortedKeyframes.findIndex(k => k.id === selectedKeyframeId) : -1;
 
             if (selectedIndex === -1) {
@@ -126,7 +132,7 @@ export const useKeyframes = ({
                 }
             }
 
-            const keyframeAtNewTime = keyframes.find(k => k.time === newTime);
+            const keyframeAtNewTime = kfs.find(k => k.time === newTime);
             if (keyframeAtNewTime) {
                 toast.error("A keyframe already exists at the calculated time. Please adjust.");
                 return;
@@ -164,22 +170,22 @@ export const useKeyframes = ({
             toast.success("Keyframe added!");
             return newTime;
         }
-    }, [currentPose, keyframes, selectedKeyframeId, animationDuration, setAnimationDuration]);
+    }, [currentPose, selectedKeyframeId, animationDuration, setAnimationDuration]);
 
     const handleSelectKeyframe = useCallback((id: string) => {
-        const keyframe = keyframes.find(k => k.id === id);
+        const keyframe = keyframesRef.current.find(k => k.id === id);
         if (keyframe && setPose) {
             setPose(keyframe.pose);
             setSelectedKeyframeId(id);
             scrubToTime(keyframe.time);
         }
-    }, [keyframes, setPose, scrubToTime]);
+    }, [setPose, scrubToTime]);
 
     const handleManualPoseChange = (newPose: Pose) => {
         setPose(newPose);
 
         if (selectedKeyframeId) {
-            const updatedKeyframes = keyframes.map(k =>
+            const updatedKeyframes = keyframesRef.current.map(k =>
                 k.id === selectedKeyframeId ? { ...k, pose: newPose } : k
             );
             setKeyframes(updatedKeyframes);

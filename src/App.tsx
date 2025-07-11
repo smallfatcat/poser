@@ -17,30 +17,19 @@ import { saveAs } from 'file-saver';
 import { Pose } from './types';
 import { useAnimation } from './hooks/useAnimation';
 import { useKeyframes } from './hooks/useKeyframes';
-
-type LoopMode = 'none' | 'loop' | 'pingPong';
+import { SettingsProvider, useSettings } from './context/SettingsContext';
 
 const App: React.FC = () => {
     const { width, height } = useWindowSize();
     const { currentPose, setPose } = usePose();
+    const {
+        onionSkinning,
+        loopMode,
+    } = useSettings();
+
     const [animationDuration, setAnimationDuration] = useState(5000);
     const [currentTime, setCurrentTime] = useState(0);
     const [guidePositions, setGuidePositions] = useState({ x: 5, y: 90 });
-    const [timeDisplayMode, setTimeDisplayMode] = useState<'seconds' | 'frames'>('seconds');
-    const [loopMode, setLoopMode] = useState<LoopMode>('none');
-    const [onionSkinning, setOnionSkinning] = useState(false);
-
-    const toggleLoopMode = () => {
-        setLoopMode(prev => {
-            if (prev === 'none') return 'loop';
-            if (prev === 'loop') return 'pingPong';
-            return 'none';
-        });
-    };
-
-    const toggleTimeDisplayMode = () => {
-        setTimeDisplayMode(prev => prev === 'seconds' ? 'frames' : 'seconds');
-    };
 
     const {
         keyframes,
@@ -56,10 +45,6 @@ const App: React.FC = () => {
         setAnimationDuration,
     });
 
-    const [useRelativeConstraints, setUseRelativeConstraints] = useState(true);
-    const [useInverseKinematics, setUseInverseKinematics] = useState(true);
-    const [jointVisibility, setJointVisibility] = useState<'always' | 'hover' | 'never'>('hover');
-
     const keyframeTimes = keyframes.length > 0 ? keyframes.map(k => k.time) : [0];
     const maxTime = Math.max(...keyframeTimes);
 
@@ -72,11 +57,11 @@ const App: React.FC = () => {
     const prevKeyframePose = onionSkinning && currentKeyframeIndex > 0 ? sortedKeyframes[currentKeyframeIndex - 1].pose : null;
     const nextKeyframePose = onionSkinning && currentKeyframeIndex !== -1 && currentKeyframeIndex < sortedKeyframes.length - 1 ? sortedKeyframes[currentKeyframeIndex + 1].pose : null;
 
-    const handleFrameChange = useCallback((time: number) => {
-        const clampedTime = Math.max(startTime, Math.min(time, endTime));
+    const handleFrameChange = useCallback((time: number, clamp = true) => {
+        const clampedTime = clamp ? Math.max(startTime, Math.min(time, endTime)) : time;
         setCurrentTime(clampedTime);
         scrubToTime(clampedTime);
-    }, [setCurrentTime, scrubToTime, endTime]);
+    }, [setCurrentTime, scrubToTime, endTime, startTime]);
 
     const {
         isPlaying,
@@ -90,7 +75,7 @@ const App: React.FC = () => {
     });
 
     const handleScrub = useCallback((time: number) => {
-        handleFrameChange(time);
+        handleFrameChange(time, true);
         setAnimationTime(time);
     }, [handleFrameChange, setAnimationTime]);
 
@@ -127,21 +112,6 @@ const App: React.FC = () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, [currentTime, handleScrub, sortedKeyframes]);
-
-    const toggleJointVisibility = () => {
-        const visibilities: ('always' | 'hover' | 'never')[] = ['hover', 'always', 'never'];
-        const currentIndex = visibilities.indexOf(jointVisibility);
-        const nextIndex = (currentIndex + 1) % visibilities.length;
-        setJointVisibility(visibilities[nextIndex]);
-    };
-
-    const getJointVisibilityText = () => {
-        switch (jointVisibility) {
-            case 'hover': return 'Joints: Hover';
-            case 'always': return 'Joints: Always';
-            case 'never': return 'Joints: Never';
-        }
-    };
 
     const handleSave = () => {
         const animationData = {
@@ -198,29 +168,14 @@ const App: React.FC = () => {
         <div className="App">
             <Toaster />
             <Sidebar>
-                <Toolbar
-                    useRelativeConstraints={useRelativeConstraints}
-                    setUseRelativeConstraints={setUseRelativeConstraints}
-                    useInverseKinematics={useInverseKinematics}
-                    setUseInverseKinematics={setUseInverseKinematics}
-                    jointVisibility={jointVisibility}
-                    toggleJointVisibility={toggleJointVisibility}
-                    getJointVisibilityText={getJointVisibilityText}
-                    onionSkinning={onionSkinning}
-                    setOnionSkinning={setOnionSkinning}
-                />
+                <Toolbar />
                 <InspectorPanel>
                     <FileOperationsPanel onSave={handleSave} onLoad={handleLoad} />
                     <PropertiesPanel
                         boneLengths={currentPose}
                         onBoneLengthChange={(name: keyof Pose, value: number) => handleManualPoseChange({ ...currentPose, [name]: value })}
                     />
-                    <AnimationPanel
-                        timeDisplayMode={timeDisplayMode}
-                        toggleTimeDisplayMode={toggleTimeDisplayMode}
-                        loopMode={loopMode}
-                        toggleLoopMode={toggleLoopMode}
-                    />
+                    <AnimationPanel />
                 </InspectorPanel>
             </Sidebar>
             <MainContent>
@@ -231,9 +186,6 @@ const App: React.FC = () => {
                         height={canvasSize * 0.67}
                         pose={currentPose}
                         onPoseChange={handleManualPoseChange}
-                        useRelativeConstraints={useRelativeConstraints}
-                        useInverseKinematics={useInverseKinematics}
-                        jointVisibility={jointVisibility}
                         guidePositions={guidePositions}
                         setGuidePositions={setGuidePositions}
                         prevPose={prevKeyframePose}
@@ -248,7 +200,11 @@ const App: React.FC = () => {
                         onAddKeyframe={() => {
                             const newTime = handleAddKeyframe(currentTime);
                             if (typeof newTime === 'number') {
-                                handleScrub(newTime);
+                                const isExtending = newTime > endTime;
+                                handleFrameChange(newTime, !isExtending);
+                                if (isExtending) {
+                                    setAnimationTime(newTime);
+                                }
                             }
                         }}
                         currentTime={currentTime}
@@ -258,7 +214,6 @@ const App: React.FC = () => {
                         onKeyframeTimeChange={handleKeyframeTimeChange}
                         onPlay={handlePlay}
                         isPlaying={isPlaying}
-                        timeDisplayMode={timeDisplayMode}
                         setAnimationDuration={setAnimationDuration}
                     />
                 </Timeline>
@@ -269,7 +224,9 @@ const App: React.FC = () => {
 
 const Root = () => (
     <PoseProvider>
-        <App />
+        <SettingsProvider>
+            <App />
+        </SettingsProvider>
     </PoseProvider>
 );
 

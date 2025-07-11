@@ -1,20 +1,14 @@
 import React from 'react';
+import { useSettings } from '../../context/SettingsContext';
 
-type LoopMode = 'none' | 'loop' | 'pingPong';
+const AnimationPanel: React.FC = () => {
+    const {
+        timeDisplayMode,
+        toggleTimeDisplayMode,
+        loopMode,
+        toggleLoopMode,
+    } = useSettings();
 
-interface AnimationPanelProps {
-    timeDisplayMode: 'seconds' | 'frames';
-    toggleTimeDisplayMode: () => void;
-    loopMode: LoopMode;
-    toggleLoopMode: () => void;
-}
-
-const AnimationPanel: React.FC<AnimationPanelProps> = ({
-    timeDisplayMode,
-    toggleTimeDisplayMode,
-    loopMode,
-    toggleLoopMode,
-}) => {
     const getLoopButtonText = () => {
         switch (loopMode) {
             case 'loop':
