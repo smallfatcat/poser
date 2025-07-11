@@ -17,6 +17,7 @@ export const poseToCoordinates = (pose: Pose, scale: number = 1): PoseCoordinate
     const {
         hip,
         torsoAngle,
+        neckAngle = 0,
         headAngle,
         neckLength,
         headRadius,
@@ -61,7 +62,7 @@ export const poseToCoordinates = (pose: Pose, scale: number = 1): PoseCoordinate
         scale: poseScale = 1
     } = pose;
 
-    if (typeof hip !== 'object' || typeof torsoAngle !== 'number' || typeof headAngle !== 'number' || typeof neckLength !== 'number' || typeof headRadius !== 'number' || typeof leftShoulderAngle !== 'number' || typeof rightShoulderAngle !== 'number' || typeof leftUpperArmAngle !== 'number' || typeof leftLowerArmAngle !== 'number' || typeof leftHandAngle !== 'number' || typeof rightUpperArmAngle !== 'number' || typeof rightLowerArmAngle !== 'number' || typeof rightHandAngle !== 'number' || typeof leftHipAngle !== 'number' || typeof rightHipAngle !== 'number' || typeof leftUpperLegAngle !== 'number' || typeof leftLowerLegAngle !== 'number' || typeof leftFootAngle !== 'number' || typeof rightUpperLegAngle !== 'number' || typeof rightLowerLegAngle !== 'number' || typeof rightFootAngle !== 'number' || typeof leftShoulderLength !== 'number' || typeof rightShoulderLength !== 'number' || typeof leftHipLength !== 'number' || typeof rightHipLength !== 'number' || typeof leftUpperArmLength !== 'number' || typeof leftLowerArmLength !== 'number' || typeof leftHandLength !== 'number' || typeof rightUpperArmLength !== 'number' || typeof rightLowerArmLength !== 'number' || typeof rightHandLength !== 'number' || typeof torsoLength !== 'number' || typeof leftUpperLegLength !== 'number' || typeof leftLowerLegLength !== 'number' || typeof leftFootLength !== 'number' || typeof rightUpperLegLength !== 'number' || typeof rightLowerLegLength !== 'number' || typeof rightFootLength !== 'number') {
+    if (typeof hip !== 'object' || typeof torsoAngle !== 'number' || typeof neckAngle !== 'number' || typeof headAngle !== 'number' || typeof neckLength !== 'number' || typeof headRadius !== 'number' || typeof leftShoulderAngle !== 'number' || typeof rightShoulderAngle !== 'number' || typeof leftUpperArmAngle !== 'number' || typeof leftLowerArmAngle !== 'number' || typeof leftHandAngle !== 'number' || typeof rightUpperArmAngle !== 'number' || typeof rightLowerArmAngle !== 'number' || typeof rightHandAngle !== 'number' || typeof leftHipAngle !== 'number' || typeof rightHipAngle !== 'number' || typeof leftUpperLegAngle !== 'number' || typeof leftLowerLegAngle !== 'number' || typeof leftFootAngle !== 'number' || typeof rightUpperLegAngle !== 'number' || typeof rightLowerLegAngle !== 'number' || typeof rightFootAngle !== 'number' || typeof leftShoulderLength !== 'number' || typeof rightShoulderLength !== 'number' || typeof leftHipLength !== 'number' || typeof rightHipLength !== 'number' || typeof leftUpperArmLength !== 'number' || typeof leftLowerArmLength !== 'number' || typeof leftHandLength !== 'number' || typeof rightUpperArmLength !== 'number' || typeof rightLowerArmLength !== 'number' || typeof rightHandLength !== 'number' || typeof torsoLength !== 'number' || typeof leftUpperLegLength !== 'number' || typeof leftLowerLegLength !== 'number' || typeof leftFootLength !== 'number' || typeof rightUpperLegLength !== 'number' || typeof rightLowerLegLength !== 'number' || typeof rightFootLength !== 'number') {
         throw new Error("Invalid pose object");
     }
 
@@ -75,10 +76,12 @@ export const poseToCoordinates = (pose: Pose, scale: number = 1): PoseCoordinate
     const shoulder = { x: baseHip.x + shoulderOffset.x, y: baseHip.y + shoulderOffset.y };
 
     // Head/neck
-    const neckOffset = calculateOffset(90 + headAngle, neckLength * totalScale);
+    const neckOffset = calculateOffset(90 + neckAngle, neckLength * totalScale);
     const neck = { x: shoulder.x + neckOffset.x, y: shoulder.y + neckOffset.y };
-    const headOffset = calculateOffset(90 + headAngle, (neckLength + headRadius) * totalScale);
-    const head = { x: shoulder.x + headOffset.x, y: shoulder.y + headOffset.y };
+    // The neck is the pivot point - the head circle pivots around the neck
+    // Position head circle center so that the neck is at the edge of the circle
+    const headCircleOffset = calculateOffset(90 + headAngle, headRadius * totalScale);
+    const head = { x: neck.x + headCircleOffset.x, y: neck.y + headCircleOffset.y };
 
     // Left arm
     const leftShoulderOffset = calculateOffset(leftShoulderAngle, leftShoulderLength * totalScale);

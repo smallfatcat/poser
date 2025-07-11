@@ -156,6 +156,22 @@ export const usePoseInteraction = ({
 
             if (draggedJoint === 'hip') {
                 newPose.hip = { x: targetPos.x, y: targetPos.y };
+            } else if (draggedJoint === 'neck') {
+                // Special case for neck: update neckAngle and neckLength relative to shoulder
+                const parentPos = (poseToCoordinates(newPose) as any)['shoulder'];
+                if (parentPos) {
+                    const dx = targetPos.x - parentPos.x;
+                    const dy = -(targetPos.y - parentPos.y);
+                    let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                    if (angle < 0) angle += 360;
+                    angle = (angle - 90 + 360) % 360;
+                    newPose.neckAngle = angle;
+                    // Update neckLength
+                    const dxLen = targetPos.x - parentPos.x;
+                    const dyLen = targetPos.y - parentPos.y;
+                    const length = Math.sqrt(dxLen * dxLen + dyLen * dyLen) / (newPose.scale || 1);
+                    newPose.neckLength = length;
+                }
             } else {
                 // For all other joints, update angle and bone length from parent
                 const jointInfo = jointHierarchy[draggedJoint];

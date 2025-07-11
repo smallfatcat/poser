@@ -101,10 +101,28 @@ export const drawPose = (
         const end = poseData[endJoint as string];
 
         if (start && end) {
-            ctx.beginPath();
-            ctx.moveTo(start.x, start.y);
-            ctx.lineTo(end.x, end.y);
-            ctx.stroke();
+            // Special handling for neck to head connection
+            if (startJoint === 'neck' && endJoint === 'head') {
+                // The head position represents the center of the head circle
+                // The neck is the pivot point - connect neck to the edge of the head circle
+                const neck = start;
+                const headCenter = end;
+                
+                // Calculate the connection point on the edge of the head circle
+                const angleToHead = Math.atan2(headCenter.y - neck.y, headCenter.x - neck.x);
+                const connectionX = headCenter.x - headRadius * Math.cos(angleToHead);
+                const connectionY = headCenter.y - headRadius * Math.sin(angleToHead);
+                
+                ctx.beginPath();
+                ctx.moveTo(neck.x, neck.y);
+                ctx.lineTo(connectionX, connectionY);
+                ctx.stroke();
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(end.x, end.y);
+                ctx.stroke();
+            }
         }
     });
 

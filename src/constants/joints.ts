@@ -7,8 +7,8 @@ interface JointInfo {
 }
 
 export const jointHierarchy: { [key: string]: JointInfo } = {
-    'head': { parent: 'shoulder', angleParam: 'headAngle', needsOffset: true },
-    'neck': { parent: 'shoulder', angleParam: 'headAngle', needsOffset: true },
+    'head': { parent: 'neck', angleParam: 'headAngle', needsOffset: true },
+    'neck': { parent: 'shoulder', angleParam: 'neckAngle', needsOffset: true },
     'shoulder': { parent: 'hip', angleParam: 'torsoAngle', needsOffset: true },
     'leftShoulder': { parent: 'shoulder', angleParam: 'leftShoulderAngle', needsOffset: false },
     'rightShoulder': { parent: 'shoulder', angleParam: 'rightShoulderAngle', needsOffset: false },

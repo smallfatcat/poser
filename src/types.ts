@@ -10,23 +10,20 @@ export type PoseCoordinates = {
 export interface Pose {
     hip: Vector2;
     torsoAngle: number;
+    neckAngle?: number;
     headAngle: number;
     neckLength: number;
     headRadius: number;
-
     leftShoulderAngle: number;
     rightShoulderAngle: number;
-
     leftUpperArmAngle: number;
     leftLowerArmAngle: number;
     leftHandAngle: number;
     rightUpperArmAngle: number;
     rightLowerArmAngle: number;
     rightHandAngle: number;
-
     leftHipAngle: number;
     rightHipAngle: number;
-
     leftUpperLegAngle: number;
     leftLowerLegAngle: number;
     leftFootAngle: number;
@@ -34,22 +31,16 @@ export interface Pose {
     rightLowerLegAngle: number;
     rightFootAngle: number;
     shoulderWidth: number;
-
     leftShoulderLength: number;
     rightShoulderLength: number;
-
     leftHipLength: number;
     rightHipLength: number;
-    
-    // Left side bone lengths
     leftUpperArmLength: number;
     leftLowerArmLength: number;
     leftHandLength: number;
-    // Right side bone lengths
     rightUpperArmLength: number;
     rightLowerArmLength: number;
     rightHandLength: number;
-    // Center bone lengths
     torsoLength: number;
     leftUpperLegLength: number;
     leftLowerLegLength: number;
@@ -57,8 +48,8 @@ export interface Pose {
     rightUpperLegLength: number;
     rightLowerLegLength: number;
     rightFootLength: number;
-    scale: number;
-    [key: string]: number | Vector2; // Keep flexible for interpolation
+    scale?: number;
+    [key: string]: number | Vector2 | undefined;
 }
 
 export interface IkChains {
