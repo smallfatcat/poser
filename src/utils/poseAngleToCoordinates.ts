@@ -20,12 +20,16 @@ export const poseToCoordinates = (pose: Pose, scale: number = 1): PoseCoordinate
         headAngle,
         neckLength,
         headRadius,
+        leftShoulderAngle,
+        rightShoulderAngle,
         leftUpperArmAngle,
         leftLowerArmAngle,
         leftHandAngle,
         rightUpperArmAngle,
         rightLowerArmAngle,
         rightHandAngle,
+        leftHipAngle,
+        rightHipAngle,
         leftUpperLegAngle,
         leftLowerLegAngle,
         leftFootAngle,
@@ -33,6 +37,11 @@ export const poseToCoordinates = (pose: Pose, scale: number = 1): PoseCoordinate
         rightLowerLegAngle,
         rightFootAngle,
         shoulderWidth,
+        // New bone lengths
+        leftShoulderLength,
+        rightShoulderLength,
+        leftHipLength,
+        rightHipLength,
         // Left side bone lengths
         leftUpperArmLength,
         leftLowerArmLength,
@@ -52,7 +61,7 @@ export const poseToCoordinates = (pose: Pose, scale: number = 1): PoseCoordinate
         scale: poseScale = 1
     } = pose;
 
-    if (typeof hip !== 'object' || typeof torsoAngle !== 'number' || typeof headAngle !== 'number' || typeof neckLength !== 'number' || typeof headRadius !== 'number' || typeof leftUpperArmAngle !== 'number' || typeof leftLowerArmAngle !== 'number' || typeof leftHandAngle !== 'number' || typeof rightUpperArmAngle !== 'number' || typeof rightLowerArmAngle !== 'number' || typeof rightHandAngle !== 'number' || typeof leftUpperLegAngle !== 'number' || typeof leftLowerLegAngle !== 'number' || typeof leftFootAngle !== 'number' || typeof rightUpperLegAngle !== 'number' || typeof rightLowerLegAngle !== 'number' || typeof rightFootAngle !== 'number' || typeof leftUpperArmLength !== 'number' || typeof leftLowerArmLength !== 'number' || typeof leftHandLength !== 'number' || typeof rightUpperArmLength !== 'number' || typeof rightLowerArmLength !== 'number' || typeof rightHandLength !== 'number' || typeof torsoLength !== 'number' || typeof leftUpperLegLength !== 'number' || typeof leftLowerLegLength !== 'number' || typeof leftFootLength !== 'number' || typeof rightUpperLegLength !== 'number' || typeof rightLowerLegLength !== 'number' || typeof rightFootLength !== 'number') {
+    if (typeof hip !== 'object' || typeof torsoAngle !== 'number' || typeof headAngle !== 'number' || typeof neckLength !== 'number' || typeof headRadius !== 'number' || typeof leftShoulderAngle !== 'number' || typeof rightShoulderAngle !== 'number' || typeof leftUpperArmAngle !== 'number' || typeof leftLowerArmAngle !== 'number' || typeof leftHandAngle !== 'number' || typeof rightUpperArmAngle !== 'number' || typeof rightLowerArmAngle !== 'number' || typeof rightHandAngle !== 'number' || typeof leftHipAngle !== 'number' || typeof rightHipAngle !== 'number' || typeof leftUpperLegAngle !== 'number' || typeof leftLowerLegAngle !== 'number' || typeof leftFootAngle !== 'number' || typeof rightUpperLegAngle !== 'number' || typeof rightLowerLegAngle !== 'number' || typeof rightFootAngle !== 'number' || typeof leftShoulderLength !== 'number' || typeof rightShoulderLength !== 'number' || typeof leftHipLength !== 'number' || typeof rightHipLength !== 'number' || typeof leftUpperArmLength !== 'number' || typeof leftLowerArmLength !== 'number' || typeof leftHandLength !== 'number' || typeof rightUpperArmLength !== 'number' || typeof rightLowerArmLength !== 'number' || typeof rightHandLength !== 'number' || typeof torsoLength !== 'number' || typeof leftUpperLegLength !== 'number' || typeof leftLowerLegLength !== 'number' || typeof leftFootLength !== 'number' || typeof rightUpperLegLength !== 'number' || typeof rightLowerLegLength !== 'number' || typeof rightFootLength !== 'number') {
         throw new Error("Invalid pose object");
     }
 
@@ -72,32 +81,40 @@ export const poseToCoordinates = (pose: Pose, scale: number = 1): PoseCoordinate
     const head = { x: shoulder.x + headOffset.x, y: shoulder.y + headOffset.y };
 
     // Left arm
+    const leftShoulderOffset = calculateOffset(leftShoulderAngle, leftShoulderLength * totalScale);
+    const leftShoulder = { x: shoulder.x + leftShoulderOffset.x, y: shoulder.y + leftShoulderOffset.y };
     const leftUpperArmOffset = calculateOffset(leftUpperArmAngle, leftUpperArmLength * totalScale);
-    const leftUpperArm = { x: shoulder.x + leftUpperArmOffset.x, y: shoulder.y + leftUpperArmOffset.y };
+    const leftUpperArm = { x: leftShoulder.x + leftUpperArmOffset.x, y: leftShoulder.y + leftUpperArmOffset.y };
     const leftLowerArmOffset = calculateOffset(leftLowerArmAngle, leftLowerArmLength * totalScale);
     const leftLowerArm = { x: leftUpperArm.x + leftLowerArmOffset.x, y: leftUpperArm.y + leftLowerArmOffset.y };
     const leftHandOffset = calculateOffset(leftHandAngle, leftHandLength * totalScale);
     const leftHand = { x: leftLowerArm.x + leftHandOffset.x, y: leftLowerArm.y + leftHandOffset.y };
 
     // Right arm
+    const rightShoulderOffset = calculateOffset(rightShoulderAngle, rightShoulderLength * totalScale);
+    const rightShoulder = { x: shoulder.x + rightShoulderOffset.x, y: shoulder.y + rightShoulderOffset.y };
     const rightUpperArmOffset = calculateOffset(rightUpperArmAngle, rightUpperArmLength * totalScale);
-    const rightUpperArm = { x: shoulder.x + rightUpperArmOffset.x, y: shoulder.y + rightUpperArmOffset.y };
+    const rightUpperArm = { x: rightShoulder.x + rightUpperArmOffset.x, y: rightShoulder.y + rightUpperArmOffset.y };
     const rightLowerArmOffset = calculateOffset(rightLowerArmAngle, rightLowerArmLength * totalScale);
     const rightLowerArm = { x: rightUpperArm.x + rightLowerArmOffset.x, y: rightUpperArm.y + rightLowerArmOffset.y };
     const rightHandOffset = calculateOffset(rightHandAngle, rightHandLength * totalScale);
     const rightHand = { x: rightLowerArm.x + rightHandOffset.x, y: rightLowerArm.y + rightHandOffset.y };
 
     // Left leg
+    const leftHipOffset = calculateOffset(leftHipAngle, leftHipLength * totalScale);
+    const leftHip = { x: baseHip.x + leftHipOffset.x, y: baseHip.y + leftHipOffset.y };
     const leftUpperLegOffset = calculateOffset(leftUpperLegAngle, leftUpperLegLength * totalScale);
-    const leftUpperLeg = { x: baseHip.x + leftUpperLegOffset.x, y: baseHip.y + leftUpperLegOffset.y };
+    const leftUpperLeg = { x: leftHip.x + leftUpperLegOffset.x, y: leftHip.y + leftUpperLegOffset.y };
     const leftLowerLegOffset = calculateOffset(leftLowerLegAngle, leftLowerLegLength * totalScale);
     const leftLowerLeg = { x: leftUpperLeg.x + leftLowerLegOffset.x, y: leftUpperLeg.y + leftLowerLegOffset.y };
     const leftFootOffset = calculateOffset(leftFootAngle, leftFootLength * totalScale);
     const leftFoot = { x: leftLowerLeg.x + leftFootOffset.x, y: leftLowerLeg.y + leftFootOffset.y };
 
     // Right leg
+    const rightHipOffset = calculateOffset(rightHipAngle, rightHipLength * totalScale);
+    const rightHip = { x: baseHip.x + rightHipOffset.x, y: baseHip.y + rightHipOffset.y };
     const rightUpperLegOffset = calculateOffset(rightUpperLegAngle, rightUpperLegLength * totalScale);
-    const rightUpperLeg = { x: baseHip.x + rightUpperLegOffset.x, y: baseHip.y + rightUpperLegOffset.y };
+    const rightUpperLeg = { x: rightHip.x + rightUpperLegOffset.x, y: rightHip.y + rightUpperLegOffset.y };
     const rightLowerLegOffset = calculateOffset(rightLowerLegAngle, rightLowerLegLength * totalScale);
     const rightLowerLeg = { x: rightUpperLeg.x + rightLowerLegOffset.x, y: rightUpperLeg.y + rightLowerLegOffset.y };
     const rightFootOffset = calculateOffset(rightFootAngle, rightFootLength * totalScale);
@@ -107,6 +124,8 @@ export const poseToCoordinates = (pose: Pose, scale: number = 1): PoseCoordinate
         head,
         neck,
         shoulder,
+        leftShoulder,
+        rightShoulder,
         leftUpperArm,
         leftLowerArm,
         leftHand,
@@ -114,6 +133,8 @@ export const poseToCoordinates = (pose: Pose, scale: number = 1): PoseCoordinate
         rightLowerArm,
         rightHand,
         hip: baseHip,
+        leftHip,
+        rightHip,
         leftUpperLeg,
         leftLowerLeg,
         leftFoot,

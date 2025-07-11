@@ -15,12 +15,16 @@ const BoneSlider: React.FC<BoneSliderProps> = memo(({ name, value, onChange, min
         if (name === 'scale') return 'Scale';
         if (name === 'torsoLength') return 'Torso';
         if (name === 'neckLength') return 'Neck';
+        if (name.includes('leftShoulder')) return 'Left Shoulder';
+        if (name.includes('rightShoulder')) return 'Right Shoulder';
         if (name.includes('leftUpperArm')) return 'Left Upper Arm';
         if (name.includes('leftLowerArm')) return 'Left Lower Arm';
         if (name.includes('leftHand')) return 'Left Hand';
         if (name.includes('rightUpperArm')) return 'Right Upper Arm';
         if (name.includes('rightLowerArm')) return 'Right Lower Arm';
         if (name.includes('rightHand')) return 'Right Hand';
+        if (name.includes('leftHip')) return 'Left Hip';
+        if (name.includes('rightHip')) return 'Right Hip';
         if (name.includes('leftUpperLeg')) return 'Left Upper Leg';
         if (name.includes('leftLowerLeg')) return 'Left Lower Leg';
         if (name.includes('leftFoot')) return 'Left Foot';
@@ -68,6 +72,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = memo(({ boneLengths, onB
             
             <h3 className={styles.groupTitle}>Left Arm</h3>
             <div className={styles.slidersContainer}>
+                <BoneSlider name="leftShoulderLength" value={boneLengths.leftShoulderLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftUpperArmLength" value={boneLengths.leftUpperArmLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftLowerArmLength" value={boneLengths.leftLowerArmLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftHandLength" value={boneLengths.leftHandLength as number} onChange={onBoneLengthChange} />
@@ -75,6 +80,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = memo(({ boneLengths, onB
             
             <h3 className={styles.groupTitle}>Right Arm</h3>
             <div className={styles.slidersContainer}>
+                <BoneSlider name="rightShoulderLength" value={boneLengths.rightShoulderLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightUpperArmLength" value={boneLengths.rightUpperArmLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightLowerArmLength" value={boneLengths.rightLowerArmLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightHandLength" value={boneLengths.rightHandLength as number} onChange={onBoneLengthChange} />
@@ -82,6 +88,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = memo(({ boneLengths, onB
             
             <h3 className={styles.groupTitle}>Left Leg</h3>
             <div className={styles.slidersContainer}>
+                <BoneSlider name="leftHipLength" value={boneLengths.leftHipLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftUpperLegLength" value={boneLengths.leftUpperLegLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftLowerLegLength" value={boneLengths.leftLowerLegLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftFootLength" value={boneLengths.leftFootLength as number} onChange={onBoneLengthChange} />
@@ -89,6 +96,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = memo(({ boneLengths, onB
             
             <h3 className={styles.groupTitle}>Right Leg</h3>
             <div className={styles.slidersContainer}>
+                <BoneSlider name="rightHipLength" value={boneLengths.rightHipLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightUpperLegLength" value={boneLengths.rightUpperLegLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightLowerLegLength" value={boneLengths.rightLowerLegLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightFootLength" value={boneLengths.rightFootLength as number} onChange={onBoneLengthChange} />

@@ -13,12 +13,20 @@ export interface Pose {
     headAngle: number;
     neckLength: number;
     headRadius: number;
+
+    leftShoulderAngle: number;
+    rightShoulderAngle: number;
+
     leftUpperArmAngle: number;
     leftLowerArmAngle: number;
     leftHandAngle: number;
     rightUpperArmAngle: number;
     rightLowerArmAngle: number;
     rightHandAngle: number;
+
+    leftHipAngle: number;
+    rightHipAngle: number;
+
     leftUpperLegAngle: number;
     leftLowerLegAngle: number;
     leftFootAngle: number;
@@ -26,6 +34,13 @@ export interface Pose {
     rightLowerLegAngle: number;
     rightFootAngle: number;
     shoulderWidth: number;
+
+    leftShoulderLength: number;
+    rightShoulderLength: number;
+
+    leftHipLength: number;
+    rightHipLength: number;
+    
     // Left side bone lengths
     leftUpperArmLength: number;
     leftLowerArmLength: number;

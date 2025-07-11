@@ -1,4 +1,5 @@
 import { PoseCoordinates, DrawConfig, StyleConfig } from "../types";
+import { boneConnections } from "../constants/joints";
 
 // Draw joint points
 export const drawJoints = (
@@ -94,57 +95,26 @@ export const drawPose = (
     ctx.lineWidth = strokeWidth;
     ctx.lineCap = 'round';
     
-    // Draw head (circle)
-    ctx.beginPath();
-    ctx.arc(poseData.head.x, poseData.head.y, headRadius, 0, 2 * Math.PI);
-    ctx.stroke();
-    
-    // Draw neck (head to shoulder)
-    ctx.beginPath();
-    ctx.moveTo(poseData.head.x, poseData.head.y + headRadius);
-    ctx.lineTo(poseData.shoulder.x, poseData.shoulder.y);
-    ctx.stroke();
-    
-    // Draw torso (shoulder to hip)
-    ctx.beginPath();
-    ctx.moveTo(poseData.shoulder.x, poseData.shoulder.y);
-    ctx.lineTo(poseData.hip.x, poseData.hip.y);
-    ctx.stroke();
-    
-    // Draw arms
-    // Left arm: shoulder -> upper arm -> lower arm -> hand
-    ctx.beginPath();
-    ctx.moveTo(poseData.shoulder.x, poseData.shoulder.y);
-    ctx.lineTo(poseData.leftUpperArm.x, poseData.leftUpperArm.y);
-    ctx.lineTo(poseData.leftLowerArm.x, poseData.leftLowerArm.y);
-    ctx.lineTo(poseData.leftHand.x, poseData.leftHand.y);
-    ctx.stroke();
-    
-    // Right arm: shoulder -> upper arm -> lower arm -> hand
-    ctx.beginPath();
-    ctx.moveTo(poseData.shoulder.x, poseData.shoulder.y);
-    ctx.lineTo(poseData.rightUpperArm.x, poseData.rightUpperArm.y);
-    ctx.lineTo(poseData.rightLowerArm.x, poseData.rightLowerArm.y);
-    ctx.lineTo(poseData.rightHand.x, poseData.rightHand.y);
-    ctx.stroke();
-    
-    // Draw legs
-    // Left leg: hip -> upper leg -> lower leg -> foot
-    ctx.beginPath();
-    ctx.moveTo(poseData.hip.x, poseData.hip.y);
-    ctx.lineTo(poseData.leftUpperLeg.x, poseData.leftUpperLeg.y);
-    ctx.lineTo(poseData.leftLowerLeg.x, poseData.leftLowerLeg.y);
-    ctx.lineTo(poseData.leftFoot.x, poseData.leftFoot.y);
-    ctx.stroke();
-    
-    // Right leg: hip -> upper leg -> lower leg -> foot
-    ctx.beginPath();
-    ctx.moveTo(poseData.hip.x, poseData.hip.y);
-    ctx.lineTo(poseData.rightUpperLeg.x, poseData.rightUpperLeg.y);
-    ctx.lineTo(poseData.rightLowerLeg.x, poseData.rightLowerLeg.y);
-    ctx.lineTo(poseData.rightFoot.x, poseData.rightFoot.y);
-    ctx.stroke();
+    // Draw bones based on connections
+    boneConnections.forEach(([startJoint, endJoint]) => {
+        const start = poseData[startJoint as string];
+        const end = poseData[endJoint as string];
 
+        if (start && end) {
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+            ctx.stroke();
+        }
+    });
+
+    // Draw head (circle)
+    if (poseData.head) {
+        ctx.beginPath();
+        ctx.arc(poseData.head.x, poseData.head.y, headRadius, 0, 2 * Math.PI);
+        ctx.stroke();
+    }
+    
     // Draw joint points if draggable
     if (jointVisibility !== 'never') {
         drawJoints(ctx, poseData, drawConfig);
