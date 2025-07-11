@@ -74,6 +74,17 @@ const App: React.FC = () => {
         pingPong: loopMode === 'pingPong',
     });
 
+    const addKeyframeAndAdjustTimeline = useCallback(() => {
+        const newTime = handleAddKeyframe(currentTime);
+        if (typeof newTime === 'number') {
+            const isExtending = newTime > endTime;
+            handleFrameChange(newTime, !isExtending);
+            if (isExtending) {
+                setAnimationTime(newTime);
+            }
+        }
+    }, [currentTime, endTime, handleAddKeyframe, handleFrameChange, setAnimationTime]);
+
     const handleScrub = useCallback((time: number) => {
         handleFrameChange(time, true);
         setAnimationTime(time);
@@ -106,6 +117,9 @@ const App: React.FC = () => {
                         handleScrub(nextKeyframe.time);
                     }
                 }
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                addKeyframeAndAdjustTimeline();
             }
         };
 
@@ -114,7 +128,7 @@ const App: React.FC = () => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [currentTime, handleScrub, sortedKeyframes, handleSelectKeyframe]);
+    }, [currentTime, handleScrub, sortedKeyframes, handleSelectKeyframe, addKeyframeAndAdjustTimeline]);
 
     const handleSave = () => {
         const animationData = {
@@ -200,16 +214,7 @@ const App: React.FC = () => {
                         keyframes={keyframes}
                         selectedKeyframeId={selectedKeyframeId}
                         onKeyframeSelect={handleSelectKeyframe}
-                        onAddKeyframe={() => {
-                            const newTime = handleAddKeyframe(currentTime);
-                            if (typeof newTime === 'number') {
-                                const isExtending = newTime > endTime;
-                                handleFrameChange(newTime, !isExtending);
-                                if (isExtending) {
-                                    setAnimationTime(newTime);
-                                }
-                            }
-                        }}
+                        onAddKeyframe={addKeyframeAndAdjustTimeline}
                         currentTime={currentTime}
                         startTime={0}
                         endTime={endTime}
