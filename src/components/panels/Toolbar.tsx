@@ -19,6 +19,8 @@ const Toolbar: React.FC<ToolbarProps> = memo(({ currentPose, onPoseChange }) => 
         getJointVisibilityText,
         onionSkinning,
         setOnionSkinning,
+        limbColoring,
+        setLimbColoring,
     } = useSettings();
 
     const handleScaleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +63,12 @@ const Toolbar: React.FC<ToolbarProps> = memo(({ currentPose, onPoseChange }) => 
                     className={`btn ${onionSkinning ? 'active' : ''}`}
                 >
                     Onion Skin
+                </button>
+                <button
+                    onClick={() => setLimbColoring(!limbColoring)}
+                    className={`btn ${limbColoring ? 'active' : ''}`}
+                >
+                    {limbColoring ? 'Limb Colors: On' : 'Limb Colors: Off'}
                 </button>
             </div>
             <div className="control-row">

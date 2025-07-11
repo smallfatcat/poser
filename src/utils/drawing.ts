@@ -82,7 +82,8 @@ export const drawPose = (
         jointVisibility, 
         drawJoints,
         width,
-        height
+        height,
+        limbColoring = false
     }: StyleConfig,
     drawConfig: DrawConfig
 ) => {
@@ -101,6 +102,19 @@ export const drawPose = (
         const end = poseData[endJoint as string];
 
         if (start && end) {
+            // Set color based on limb coloring setting
+            if (limbColoring) {
+                if (String(startJoint).startsWith('left') || String(endJoint).startsWith('left')) {
+                    ctx.strokeStyle = '#ff0000'; // Red for left limbs
+                } else if (String(startJoint).startsWith('right') || String(endJoint).startsWith('right')) {
+                    ctx.strokeStyle = '#00ff00'; // Green for right limbs
+                } else {
+                    ctx.strokeStyle = strokeColor; // Default color for center bones
+                }
+            } else {
+                ctx.strokeStyle = strokeColor;
+            }
+
             // Special handling for neck to head connection
             if (startJoint === 'neck' && endJoint === 'head') {
                 // The head position represents the center of the head circle

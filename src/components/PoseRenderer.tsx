@@ -50,6 +50,7 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
         useInverseKinematics,
         disableConstraints,
         jointVisibility,
+        limbColoring,
     } = useSettings();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [excludedJoints, setExcludedJoints] = useState(new Set<string>());
@@ -211,6 +212,7 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
                     prevPose={prevPose}
                     nextPose={nextPose}
                     currentPose={pose}
+                    limbColoring={limbColoring}
                 />
                 <div className={styles.version}>
                     v{__APP_VERSION__}

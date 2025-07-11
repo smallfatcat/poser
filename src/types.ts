@@ -75,4 +75,5 @@ export interface StyleConfig {
     drawJoints: (ctx: CanvasRenderingContext2D, poseCoordinates: PoseCoordinates, drawConfig: DrawConfig) => void;
     width: number;
     height: number;
+    limbColoring?: boolean;
 } 

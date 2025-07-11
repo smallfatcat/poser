@@ -20,6 +20,8 @@ interface SettingsContextType {
     toggleTimeDisplayMode: () => void;
     loopMode: LoopMode;
     toggleLoopMode: () => void;
+    limbColoring: boolean;
+    setLimbColoring: (value: boolean) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -32,6 +34,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     const [onionSkinning, setOnionSkinning] = useState(false);
     const [timeDisplayMode, setTimeDisplayMode] = useState<TimeDisplayMode>('seconds');
     const [loopMode, setLoopMode] = useState<LoopMode>('none');
+    const [limbColoring, setLimbColoring] = useState(false);
 
     const toggleJointVisibility = () => {
         const visibilities: JointVisibility[] = ['hover', 'always', 'never'];
@@ -76,6 +79,8 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         toggleTimeDisplayMode,
         loopMode,
         toggleLoopMode,
+        limbColoring,
+        setLimbColoring,
     };
 
     return (

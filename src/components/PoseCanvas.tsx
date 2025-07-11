@@ -26,6 +26,7 @@ interface PoseCanvasProps {
     prevPose?: Pose | null;
     nextPose?: Pose | null;
     currentPose?: Pose | null;
+    limbColoring?: boolean;
 }
 
 const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
@@ -49,6 +50,7 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
     prevPose,
     nextPose,
     currentPose,
+    limbColoring = false,
 }, ref) => {
     const internalRef = useRef<HTMLCanvasElement>(null);
     const canvasRef = (ref as React.RefObject<HTMLCanvasElement>) || internalRef;
@@ -85,7 +87,8 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
                 jointVisibility,
                 width,
                 height,
-                drawJoints
+                drawJoints,
+                limbColoring
             };
             if(shouldClear) {
                 ctx.clearRect(0, 0, width, height);
@@ -97,7 +100,8 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
                 const prevGhostStyle = { 
                     ...styleConfig, 
                     strokeColor: 'rgba(0, 255, 0, 0.2)',
-                    headRadius: prevHeadRadius
+                    headRadius: prevHeadRadius,
+                    limbColoring
                 };
                 drawPose(ctx, poseToCoordinates(prevPose), prevGhostStyle, drawConfig);
             }
@@ -107,7 +111,8 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
                 const nextGhostStyle = { 
                     ...styleConfig, 
                     strokeColor: 'rgba(0, 255, 0, 0.2)',
-                    headRadius: nextHeadRadius
+                    headRadius: nextHeadRadius,
+                    limbColoring
                 };
                 drawPose(ctx, poseToCoordinates(nextPose), nextGhostStyle, drawConfig);
             }
