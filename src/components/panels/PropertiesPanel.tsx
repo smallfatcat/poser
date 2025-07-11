@@ -15,6 +15,7 @@ const BoneSlider: React.FC<BoneSliderProps> = memo(({ name, value, onChange, min
         if (name === 'scale') return 'Scale';
         if (name === 'torsoLength') return 'Torso';
         if (name === 'neckLength') return 'Neck';
+        if (name === 'headRadius') return 'Head Size';
         if (name.includes('leftShoulder')) return 'Left Shoulder';
         if (name.includes('rightShoulder')) return 'Right Shoulder';
         if (name.includes('leftUpperArm')) return 'Left Upper Arm';
@@ -68,6 +69,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = memo(({ boneLengths, onB
             <div className={styles.slidersContainer}>
                 <BoneSlider name="torsoLength" value={boneLengths.torsoLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="neckLength" value={boneLengths.neckLength as number} onChange={onBoneLengthChange} />
+                <BoneSlider name="headRadius" value={boneLengths.headRadius as number} onChange={onBoneLengthChange} min={5} max={50} />
             </div>
             
             <h3 className={styles.groupTitle}>Left Arm</h3>

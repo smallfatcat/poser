@@ -53,7 +53,8 @@ const App: React.FC = () => {
     const maxTime = Math.max(...keyframeTimes);
 
     const startTime = 0;
-    const endTime = Math.max(animationDuration, maxTime, videoDuration);
+    // When loading animations, prioritize the animation duration over video duration
+    const endTime = Math.max(animationDuration, maxTime);
 
     const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
     const currentKeyframeIndex = sortedKeyframes.findIndex(k => k.time >= currentTime);
@@ -136,8 +137,8 @@ const App: React.FC = () => {
 
     const handleSave = () => {
         const animationData = {
-            version: "1.3.0",
-            animationDuration,
+            version: "1.3.2",
+            animationDuration: endTime,
             keyframes,
         };
         const data = JSON.stringify(animationData, null, 2);

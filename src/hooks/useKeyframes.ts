@@ -17,22 +17,9 @@ export const useKeyframes = ({
     const { currentPose, setPose } = usePose();
     const [keyframes, setKeyframes] = useState<Keyframe[]>([]);
     const [selectedKeyframeId, setSelectedKeyframeId] = useState<string | undefined>(undefined);
-    const lastDurationRef = useRef(animationDuration);
 
     const keyframesRef = useRef(keyframes);
     keyframesRef.current = keyframes;
-
-    useEffect(() => {
-        if (lastDurationRef.current !== animationDuration && lastDurationRef.current > 0) {
-            const ratio = animationDuration / lastDurationRef.current;
-            const updatedKeyframes = keyframesRef.current.map(kf => ({
-                ...kf,
-                time: Math.round(kf.time * ratio)
-            }));
-            setKeyframes(updatedKeyframes);
-        }
-        lastDurationRef.current = animationDuration;
-    }, [animationDuration]);
 
     useEffect(() => {
         if (keyframes.length === 0 && currentPose) {
@@ -93,7 +80,6 @@ export const useKeyframes = ({
 
         if ((oldLastKeyframe && oldLastKeyframe.id === id) || newLastTime > animationDuration) {
             setAnimationDuration(newLastTime);
-            lastDurationRef.current = newLastTime;
         }
 
         setKeyframes(updatedKeyframes);
@@ -123,7 +109,6 @@ export const useKeyframes = ({
                 if (isLastFrame) {
                     newTime = animationDuration + 1000;
                     setAnimationDuration(newTime);
-                    lastDurationRef.current = newTime;
                     didExtendDuration = true;
                 } else {
                     const currentKeyframe = sortedKeyframes[selectedIndex];
@@ -140,7 +125,6 @@ export const useKeyframes = ({
 
             if (!didExtendDuration && newTime > animationDuration) {
                 setAnimationDuration(newTime);
-                lastDurationRef.current = newTime;
             }
 
             const newKeyframe: Keyframe = {
@@ -158,7 +142,6 @@ export const useKeyframes = ({
             const newTime = time;
             if (newTime > animationDuration) {
                 setAnimationDuration(newTime);
-                lastDurationRef.current = newTime;
             }
             const newKeyframe: Keyframe = {
                 id: `keyframe_${Date.now()}`,
