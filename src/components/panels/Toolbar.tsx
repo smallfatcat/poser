@@ -1,8 +1,13 @@
 import React, { memo } from 'react';
 import { useSettings } from '../../context/SettingsContext';
-import { usePose } from '../../context/PoseContext';
+import { Pose } from '../../types';
 
-const Toolbar: React.FC = memo(() => {
+interface ToolbarProps {
+    currentPose: Pose;
+    onPoseChange: (pose: Pose) => void;
+}
+
+const Toolbar: React.FC<ToolbarProps> = memo(({ currentPose, onPoseChange }) => {
     const {
         useRelativeConstraints,
         setUseRelativeConstraints,
@@ -16,11 +21,9 @@ const Toolbar: React.FC = memo(() => {
         setOnionSkinning,
     } = useSettings();
 
-    const { currentPose, setPose } = usePose();
-
     const handleScaleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newScale = parseFloat(e.target.value) / 100;
-        setPose({ ...currentPose, scale: newScale });
+        onPoseChange({ ...currentPose, scale: newScale });
     };
 
     return (

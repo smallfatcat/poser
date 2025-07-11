@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './PlayheadDisplay.module.css';
 import { Pose } from '../types';
-import PoseCanvas from './PoseCanvas';
-import { poseToCoordinates } from '../utils/poseAngleToCoordinates';
+import KeyframeThumbnail from './KeyframeThumbnail';
 import { useSettings } from '../context/SettingsContext';
 
 export interface Keyframe {
@@ -24,6 +23,8 @@ interface PlayheadDisplayProps {
   onPlay: () => void;
   isPlaying: boolean;
   setAnimationDuration: (duration: number) => void;
+  canvasWidth: number;
+  canvasHeight: number;
 }
 
 const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
@@ -39,6 +40,8 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
   onPlay,
   isPlaying,
   setAnimationDuration,
+  canvasWidth,
+  canvasHeight,
 }) => {
   const { timeDisplayMode } = useSettings();
   const [isDraggingPlayhead, setIsDraggingPlayhead] = useState(false);
@@ -170,7 +173,6 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
             />
             {keyframes.map((keyframe) => {
             const keyframePosition = getPosition(keyframe.time);
-            const poseCoords = poseToCoordinates(keyframe.pose, 1);
             return (
                 <div
                 key={keyframe.id}
@@ -187,26 +189,14 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
                         keyframe.id === selectedKeyframeId ? styles.selected : ''
                     }`} />
                     <div className={styles.thumbnail}>
-                        <div className={styles.thumbnailCanvasContainer}>
-                            <PoseCanvas
-                                width={200}
-                                height={134}
-                                poseCoordinates={poseToCoordinates(keyframe.pose, 0.25)}
-                                strokeColor="#fff"
-                                strokeWidth={1}
-                                headRadius={5}
-                                jointVisibility="never"
-                                draggable={false}
-                                isDragging={false}
-                                useInverseKinematics={false}
-                                draggedJoint={null}
-                                hoveredJoint={null}
-                                excludedJoints={new Set()}
-                                className=""
-                                style={{}}
-                                shouldClear={true}
-                            />
-                        </div>
+                        <KeyframeThumbnail
+                            pose={keyframe.pose}
+                            size={80}
+                            backgroundColor="#222"
+                            strokeColor="#0f0"
+                            canvasWidth={canvasWidth}
+                            canvasHeight={canvasHeight}
+                        />
                         <div className={styles.thumbnailTime}>
                             {timeDisplayMode === 'seconds'
                                 ? `${(keyframe.time / 1000).toFixed(2)}s`

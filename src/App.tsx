@@ -184,12 +184,17 @@ const App: React.FC = () => {
     }
 
     const canvasSize = Math.min(width * 0.9, height * 0.9, 800);
+    const canvasWidth = canvasSize;
+    const canvasHeight = canvasSize * 0.67;
 
     return (
         <div className="App">
             <Toaster />
             <Sidebar>
-                <Toolbar />
+                <Toolbar
+                    currentPose={currentPose}
+                    onPoseChange={handleManualPoseChange}
+                />
                 <InspectorPanel>
                     <FileOperationsPanel onSave={handleSave} onLoad={handleLoad} />
                     <VideoPanel 
@@ -198,7 +203,7 @@ const App: React.FC = () => {
                     />
                     <PropertiesPanel
                         boneLengths={currentPose}
-                        onBoneLengthChange={(name: keyof Pose, value: number) => handleManualPoseChange({ ...currentPose, [name]: value })}
+                        onBoneLengthChange={(name: string, value: number) => handleManualPoseChange({ ...currentPose, [name]: value })}
                     />
                     <AnimationPanel />
                 </InspectorPanel>
@@ -219,7 +224,11 @@ const App: React.FC = () => {
                         videoOpacity={videoOpacity}
                     />
                 </Viewport>
-                <Timeline>
+                <Timeline
+                    canvasWidth={canvasWidth}
+                    canvasHeight={canvasHeight}
+                >
+                    {/* @ts-expect-error Linter doesn't understand props passed via cloneElement */}
                     <PlayheadDisplay
                         keyframes={keyframes}
                         selectedKeyframeId={selectedKeyframeId}
