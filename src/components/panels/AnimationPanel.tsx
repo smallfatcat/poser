@@ -7,6 +7,8 @@ const AnimationPanel: React.FC = () => {
         toggleTimeDisplayMode,
         loopMode,
         toggleLoopMode,
+        framerate,
+        setFramerate,
     } = useSettings();
 
     const getLoopButtonText = () => {
@@ -30,11 +32,25 @@ const AnimationPanel: React.FC = () => {
                     {timeDisplayMode === 'seconds' ? 'Seconds' : 'Frames'}
                 </button>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 mb-2">
                 <label className="text-sm text-text-secondary">Loop</label>
                 <button onClick={toggleLoopMode} className="px-3 py-2 text-sm rounded border bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300 transition-colors">
                     {getLoopButtonText()}
                 </button>
+            </div>
+            <div className="flex flex-col gap-2">
+                <label className="text-sm text-text-secondary">Framerate</label>
+                <div className="flex items-center gap-2">
+                    <input
+                        type="range"
+                        min="1"
+                        max="120"
+                        value={framerate}
+                        onChange={(e) => setFramerate(parseInt(e.target.value))}
+                        className="flex-1"
+                    />
+                    <span className="text-sm text-text-primary min-w-[3rem]">{framerate} FPS</span>
+                </div>
             </div>
         </div>
     );

@@ -22,6 +22,8 @@ interface SettingsContextType {
     toggleLoopMode: () => void;
     limbColoring: boolean;
     setLimbColoring: (value: boolean) => void;
+    framerate: number;
+    setFramerate: (value: number) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -35,6 +37,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     const [timeDisplayMode, setTimeDisplayMode] = useState<TimeDisplayMode>('seconds');
     const [loopMode, setLoopMode] = useState<LoopMode>('none');
     const [limbColoring, setLimbColoring] = useState(false);
+    const [framerate, setFramerate] = useState(60);
 
     const toggleJointVisibility = () => {
         const visibilities: JointVisibility[] = ['hover', 'always', 'never'];
@@ -81,6 +84,8 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         toggleLoopMode,
         limbColoring,
         setLimbColoring,
+        framerate,
+        setFramerate,
     };
 
     return (

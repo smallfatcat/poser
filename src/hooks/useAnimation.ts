@@ -5,14 +5,17 @@ interface UseAnimationProps {
     onFrame: (time: number) => void;
     loop?: boolean;
     pingPong?: boolean;
+    framerate?: number;
 }
 
-export const useAnimation = ({ animationDuration, onFrame, loop, pingPong }: UseAnimationProps) => {
+export const useAnimation = ({ animationDuration, onFrame, loop, pingPong, framerate = 60 }: UseAnimationProps) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isReversing, setIsReversing] = useState(false);
     const animationFrameRef = useRef<number>();
     const lastFrameTimeRef = useRef<number>(0);
+    const startTimeRef = useRef<number>(0);
+    const startAnimationTimeRef = useRef<number>(0);
 
     const handlePlay = useCallback(() => {
         if (!isPlaying && currentTime >= animationDuration) {
@@ -31,23 +34,30 @@ export const useAnimation = ({ animationDuration, onFrame, loop, pingPong }: Use
 
     useEffect(() => {
         if (isPlaying) {
-            let startTime = performance.now() - (isReversing ? animationDuration - currentTime : currentTime);
+            // Initialize or reset timing when starting or when framerate changes
+            startTimeRef.current = performance.now();
+            startAnimationTimeRef.current = isReversing ? animationDuration - currentTime : currentTime;
 
             const animate = (timestamp: number) => {
-                // Throttle to 60fps to prevent excessive updates
-                if (timestamp - lastFrameTimeRef.current < 16.67) { // ~60fps
+                // Throttle to specified framerate
+                const frameInterval = 1000 / framerate;
+                if (timestamp - lastFrameTimeRef.current < frameInterval) {
                     animationFrameRef.current = requestAnimationFrame(animate);
                     return;
                 }
 
-                const elapsed = timestamp - startTime;
-                let newTime = isReversing ? animationDuration - elapsed : elapsed;
+                // Calculate animation time based on real time and framerate
+                const realElapsed = timestamp - startTimeRef.current;
+                const speedMultiplier = framerate / 60; // 60fps is baseline
+                const animationElapsed = startAnimationTimeRef.current + (realElapsed * speedMultiplier);
+                let newTime = isReversing ? animationDuration - animationElapsed : animationElapsed;
 
                 if (isReversing) {
                     if (newTime <= 0) {
                         if (loop) {
                             setIsReversing(false);
-                            startTime = timestamp;
+                            startTimeRef.current = timestamp;
+                            startAnimationTimeRef.current = 0;
                             onFrame(0);
                         } else {
                             setIsPlaying(false);
@@ -62,11 +72,13 @@ export const useAnimation = ({ animationDuration, onFrame, loop, pingPong }: Use
                         if (loop) {
                             if (pingPong) {
                                 setIsReversing(true);
-                                startTime = timestamp;
+                                startTimeRef.current = timestamp;
+                                startAnimationTimeRef.current = 0;
                                 onFrame(animationDuration);
                             } else {
                                 setCurrentTime(0);
-                                startTime = timestamp;
+                                startTimeRef.current = timestamp;
+                                startAnimationTimeRef.current = 0;
                                 onFrame(0);
                             }
                         } else {
@@ -98,7 +110,7 @@ export const useAnimation = ({ animationDuration, onFrame, loop, pingPong }: Use
                 cancelAnimationFrame(animationFrameRef.current);
             }
         };
-    }, [isPlaying, animationDuration, onFrame, loop, pingPong, isReversing, currentTime]);
+    }, [isPlaying, animationDuration, onFrame, loop, pingPong, isReversing, currentTime, framerate]);
 
     return {
         currentTime,

@@ -29,6 +29,7 @@ const App: React.FC = () => {
     const {
         onionSkinning,
         loopMode,
+        framerate,
     } = useSettings();
 
     const [animationDuration, setAnimationDuration] = useState(5000);
@@ -76,6 +77,7 @@ const App: React.FC = () => {
         onFrame: handleFrameChange,
         loop: loopMode !== 'none',
         pingPong: loopMode === 'pingPong',
+        framerate,
     });
 
     const addKeyframeAndAdjustTimeline = useCallback(() => {
