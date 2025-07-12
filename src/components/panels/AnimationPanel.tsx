@@ -22,17 +22,17 @@ const AnimationPanel: React.FC = () => {
     };
 
     return (
-        <div className="group">
-            <h3 className="group-title">Animation</h3>
-            <div className="control-row">
-                <label>Time Display</label>
-                <button onClick={toggleTimeDisplayMode} className="btn">
+        <div className="mb-5">
+            <h3 className="text-lg font-medium text-text-primary border-b border-border-color pb-2 mb-2.5">Animation</h3>
+            <div className="flex flex-col gap-2 mb-2">
+                <label className="text-sm text-text-secondary">Time Display</label>
+                <button onClick={toggleTimeDisplayMode} className="px-3 py-2 text-sm rounded border bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300 transition-colors">
                     {timeDisplayMode === 'seconds' ? 'Seconds' : 'Frames'}
                 </button>
             </div>
-            <div className="control-row">
-                <label>Loop</label>
-                <button onClick={toggleLoopMode} className="btn">
+            <div className="flex flex-col gap-2">
+                <label className="text-sm text-text-secondary">Loop</label>
+                <button onClick={toggleLoopMode} className="px-3 py-2 text-sm rounded border bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300 transition-colors">
                     {getLoopButtonText()}
                 </button>
             </div>

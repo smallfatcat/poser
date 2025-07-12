@@ -1,9 +1,8 @@
-import React, { useRef, useCallback, useState, useEffect } from 'react';
+import React, { useRef, useCallback, useState, useEffect, memo } from 'react';
 import { usePoseInteraction } from '../hooks/usePoseInteraction';
 import PoseCanvas from './PoseCanvas';
 import VideoBackground from './VideoBackground';
 import { usePose } from '../context/PoseContext';
-import styles from './PoseRenderer.module.css';
 import { toast } from 'react-hot-toast';
 import { Pose } from '../types';
 import { useSettings } from '../context/SettingsContext';
@@ -27,7 +26,7 @@ interface PoseRendererProps {
     videoOpacity?: number;
 }
 
-const PoseRenderer: React.FC<PoseRendererProps> = ({ 
+const PoseRenderer: React.FC<PoseRendererProps> = memo(({ 
     width = 600, 
     height = 400, 
     strokeColor = '#00ff00',
@@ -183,8 +182,8 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
     };
 
     return (
-        <div className={styles.container}>
-            <div className={styles.canvasContainer} style={{ width, height, position: 'relative' }}>
+        <div className="flex flex-col items-center gap-2.5">
+            <div className="relative" style={{ width, height }}>
                 <VideoBackground
                     width={width}
                     height={height}
@@ -207,19 +206,18 @@ const PoseRenderer: React.FC<PoseRendererProps> = ({
                     hoveredJoint={hoveredJoint}
                     excludedJoints={excludedJoints}
                     className={className}
-                    style={{ ...style, position: 'relative', zIndex: 1 }}
+                    style={style}
                     guidePositions={guidePositions}
                     prevPose={prevPose}
                     nextPose={nextPose}
-                    currentPose={pose}
+                    currentPose={currentPose}
                     limbColoring={limbColoring}
                 />
-                <div className={styles.version}>
-                    v{__APP_VERSION__}
-                </div>
             </div>
         </div>
     );
-};
+});
+
+PoseRenderer.displayName = 'PoseRenderer';
 
 export default PoseRenderer; 

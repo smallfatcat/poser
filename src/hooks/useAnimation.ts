@@ -12,6 +12,7 @@ export const useAnimation = ({ animationDuration, onFrame, loop, pingPong }: Use
     const [isPlaying, setIsPlaying] = useState(false);
     const [isReversing, setIsReversing] = useState(false);
     const animationFrameRef = useRef<number>();
+    const lastFrameTimeRef = useRef<number>(0);
 
     const handlePlay = useCallback(() => {
         if (!isPlaying && currentTime >= animationDuration) {
@@ -32,15 +33,21 @@ export const useAnimation = ({ animationDuration, onFrame, loop, pingPong }: Use
         if (isPlaying) {
             let startTime = performance.now() - (isReversing ? animationDuration - currentTime : currentTime);
 
-            const animate = () => {
-                const elapsed = performance.now() - startTime;
+            const animate = (timestamp: number) => {
+                // Throttle to 60fps to prevent excessive updates
+                if (timestamp - lastFrameTimeRef.current < 16.67) { // ~60fps
+                    animationFrameRef.current = requestAnimationFrame(animate);
+                    return;
+                }
+
+                const elapsed = timestamp - startTime;
                 let newTime = isReversing ? animationDuration - elapsed : elapsed;
 
                 if (isReversing) {
                     if (newTime <= 0) {
                         if (loop) {
                             setIsReversing(false);
-                            startTime = performance.now(); 
+                            startTime = timestamp;
                             onFrame(0);
                         } else {
                             setIsPlaying(false);
@@ -55,11 +62,11 @@ export const useAnimation = ({ animationDuration, onFrame, loop, pingPong }: Use
                         if (loop) {
                             if (pingPong) {
                                 setIsReversing(true);
-                                startTime = performance.now();
+                                startTime = timestamp;
                                 onFrame(animationDuration);
                             } else {
                                 setCurrentTime(0);
-                                startTime = performance.now();
+                                startTime = timestamp;
                                 onFrame(0);
                             }
                         } else {
@@ -72,6 +79,8 @@ export const useAnimation = ({ animationDuration, onFrame, loop, pingPong }: Use
                         onFrame(newTime);
                     }
                 }
+
+                lastFrameTimeRef.current = timestamp;
 
                 if (isPlaying) {
                     animationFrameRef.current = requestAnimationFrame(animate);
@@ -90,7 +99,6 @@ export const useAnimation = ({ animationDuration, onFrame, loop, pingPong }: Use
             }
         };
     }, [isPlaying, animationDuration, onFrame, loop, pingPong, isReversing, currentTime]);
-
 
     return {
         currentTime,

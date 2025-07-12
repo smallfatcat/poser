@@ -11,9 +11,9 @@ const VideoPanel: React.FC<VideoPanelProps> = ({ videoOpacity, onVideoOpacityCha
 
     if (!isVideoLoaded) {
         return (
-            <div className="group">
-                <h3 className="group-title">Video Controls</h3>
-                <div style={{ color: '#666', fontSize: '12px', textAlign: 'center', padding: '10px' }}>
+            <div className="mb-5">
+                <h3 className="text-lg font-medium text-text-primary border-b border-border-color pb-2 mb-2.5">Video Controls</h3>
+                <div className="text-xs text-gray-500 text-center p-2.5">
                     Load a video to access controls
                 </div>
             </div>
@@ -28,10 +28,10 @@ const VideoPanel: React.FC<VideoPanelProps> = ({ videoOpacity, onVideoOpacityCha
     };
 
     return (
-        <div className="group">
-            <h3 className="group-title">Video Controls</h3>
-            <div className="control-group">
-                <label style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>
+        <div className="mb-5">
+            <h3 className="text-lg font-medium text-text-primary border-b border-border-color pb-2 mb-2.5">Video Controls</h3>
+            <div className="mb-2.5">
+                <label className="text-xs text-gray-500 mb-1 block">
                     Opacity: {Math.round(videoOpacity * 100)}%
                 </label>
                 <input
@@ -41,12 +41,12 @@ const VideoPanel: React.FC<VideoPanelProps> = ({ videoOpacity, onVideoOpacityCha
                     step="0.1"
                     value={videoOpacity}
                     onChange={(e) => onVideoOpacityChange(parseFloat(e.target.value))}
-                    style={{ width: '100%' }}
+                    className="w-full cursor-pointer"
                 />
             </div>
             
-            <div className="control-group" style={{ marginTop: '10px' }}>
-                <div style={{ fontSize: '11px', color: '#666', display: 'flex', justifyContent: 'space-between' }}>
+            <div className="mt-2.5">
+                <div className="text-xs text-gray-500 flex justify-between">
                     <span>Duration: {formatTime(videoDuration)}</span>
                     <span>Current: {formatTime(currentVideoTime)}</span>
                 </div>

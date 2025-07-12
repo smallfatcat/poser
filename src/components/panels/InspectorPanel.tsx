@@ -6,7 +6,7 @@ interface InspectorPanelProps {
 
 const InspectorPanel: React.FC<InspectorPanelProps> = ({ children }) => {
     return (
-        <div className="inspector-panel">
+        <div className="flex flex-col gap-2.5">
             {children}
         </div>
     );

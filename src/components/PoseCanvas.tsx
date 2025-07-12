@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, forwardRef, memo } from 'react';
 import { ikChains } from '../constants/joints';
 import { drawPose, drawJoints } from '../utils/drawing';
-import styles from './PoseRenderer.module.css';
 import { PoseCoordinates, DrawConfig, StyleConfig, Pose } from '../types';
 import { poseToCoordinates } from '../utils/poseAngleToCoordinates';
 
@@ -159,10 +158,10 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
     ]);
 
     const canvasClasses = [
-        styles.canvas,
+        'block',
         className,
-        draggable ? styles.draggable : '',
-        isDragging ? styles.dragging : ''
+        draggable ? 'cursor-grab' : 'cursor-default',
+        isDragging ? 'cursor-grabbing' : ''
     ].join(' ');
 
     return (
@@ -171,7 +170,12 @@ const PoseCanvasComponent = forwardRef<HTMLCanvasElement, PoseCanvasProps>(({
             width={width}
             height={height}
             className={canvasClasses}
-            style={style}
+            style={{
+                ...style,
+                position: 'relative',
+                zIndex: 1,
+                pointerEvents: 'auto'
+            }}
         />
     );
 });

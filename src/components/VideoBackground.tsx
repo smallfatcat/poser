@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useVideo } from '../context/VideoContext';
 
 interface VideoBackgroundProps {
@@ -17,9 +17,12 @@ const VideoBackground: React.FC<VideoBackgroundProps> = ({
     const { videoElement, isVideoLoaded, videoDuration } = useVideo();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isSeeking, setIsSeeking] = useState(false);
-    const [videoFrameRate, setVideoFrameRate] = useState(30); // Default to 30fps
+    const [videoFrameRate, setVideoFrameRate] = useState(30);
+    const lastRenderTimeRef = useRef<number>(0);
+    const animationFrameRef = useRef<number>();
 
-    useEffect(() => {
+    // Throttled render function to reduce performance impact
+    const renderFrame = useCallback(() => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
         
@@ -27,8 +30,13 @@ const VideoBackground: React.FC<VideoBackgroundProps> = ({
             return;
         }
 
-        const renderFrame = () => {
-            if (!videoElement || !ctx) return;
+        const now = performance.now();
+        const frameInterval = 1000 / videoFrameRate; // Time between frames in ms
+        
+        // Only render if enough time has passed since last render
+        if (now - lastRenderTimeRef.current < frameInterval) {
+            return;
+        }
             
             try {
                 // Clear canvas
@@ -68,52 +76,46 @@ const VideoBackground: React.FC<VideoBackgroundProps> = ({
                 
                 // Reset opacity
                 ctx.globalAlpha = 1.0;
+            
+            lastRenderTimeRef.current = now;
             } catch (error) {
                 console.error('Error rendering video frame:', error);
             }
-        };
+    }, [videoElement, isVideoLoaded, width, height, opacity, videoFrameRate]);
 
-        let callbackId: number;
-
-        if ('requestVideoFrameCallback' in videoElement) {
-            const onFrame: VideoFrameRequestCallback = (now, metadata) => {
-                renderFrame();
-                // Re-register for the next frame if the video is not paused.
-                // When paused, we rely on the currentTime effect to trigger a redraw.
-                if (!videoElement.paused) {
-                    callbackId = videoElement.requestVideoFrameCallback(onFrame);
+    // Optimized video rendering loop
+    useEffect(() => {
+        if (!videoElement || !isVideoLoaded) {
+            return;
                 }
-            };
-            callbackId = videoElement.requestVideoFrameCallback(onFrame);
-            // Also render a frame immediately in case the video is paused
+
+        const animate = () => {
             renderFrame();
-        } else {
-            // Fallback for browsers that don't support it
-            const animate = () => {
-                renderFrame();
-                callbackId = requestAnimationFrame(animate);
+            animationFrameRef.current = requestAnimationFrame(animate);
             };
-            callbackId = requestAnimationFrame(animate);
-        }
+
+        // Start the animation loop
+        animationFrameRef.current = requestAnimationFrame(animate);
 
         return () => {
-            if ('requestVideoFrameCallback' in videoElement && videoElement.cancelVideoFrameCallback) {
-                videoElement.cancelVideoFrameCallback(callbackId);
-            } else {
-                cancelAnimationFrame(callbackId);
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
             }
         };
-    }, [videoElement, isVideoLoaded, width, height, opacity, currentTime]);
+    }, [videoElement, isVideoLoaded, renderFrame]);
 
     // Handle video seeking events and detect frame rate
     useEffect(() => {
         if (!videoElement) return;
 
         const handleSeeking = () => setIsSeeking(true);
-        const handleSeeked = () => setIsSeeking(false);
+        const handleSeeked = () => {
+            setIsSeeking(false);
+            // Force a render after seeking
+            renderFrame();
+        };
         const handleLoadedMetadata = () => {
             // Try to detect frame rate from video properties
-            // This is a rough estimation - browsers don't always provide accurate frame rate info
             if (videoElement.videoWidth && videoElement.videoHeight) {
                 // For most web videos, assume 30fps unless we can detect otherwise
                 setVideoFrameRate(30);
@@ -129,13 +131,12 @@ const VideoBackground: React.FC<VideoBackgroundProps> = ({
             videoElement.removeEventListener('seeked', handleSeeked);
             videoElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
         };
-    }, [videoElement]);
+    }, [videoElement, renderFrame]);
 
-    // Sync video time with timeline
+    // Sync video time with timeline - optimized to reduce frequency
     useEffect(() => {
         if (videoElement && isVideoLoaded && videoDuration > 0 && videoElement.duration > 0 && !isSeeking) {
             // Calculate video time based on current timeline time
-            // videoDuration here is the animation duration, not the video duration
             const videoTime = Math.max(0, Math.min((currentTime / videoDuration) * videoElement.duration, videoElement.duration));
             
             // Round to the nearest frame boundary for more precise synchronization
@@ -143,12 +144,10 @@ const VideoBackground: React.FC<VideoBackgroundProps> = ({
             const roundedVideoTime = Math.round(videoTime / frameDuration) * frameDuration;
             
             // Use a much smaller tolerance for frame-perfect synchronization
-            // Use the video's frame rate to determine tolerance
             const tolerance = 1 / videoFrameRate;
             
             // Only seek if the difference is significant enough to warrant a seek
             if (Math.abs(videoElement.currentTime - roundedVideoTime) > tolerance) {
-                // Use a more precise seeking method
                 videoElement.currentTime = roundedVideoTime;
             }
         }
@@ -163,6 +162,7 @@ const VideoBackground: React.FC<VideoBackgroundProps> = ({
             ref={canvasRef}
             width={width}
             height={height}
+            className="absolute top-0 left-0 z-0 pointer-events-none"
             style={{
                 position: 'absolute',
                 top: 0,

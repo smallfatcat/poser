@@ -10,6 +10,7 @@ import Viewport from './components/layout/Viewport';
 import Timeline from './components/layout/Timeline';
 import PoseRenderer from './components/PoseRenderer';
 import PlayheadDisplay from './components/PlayheadDisplay';
+import JointAngleGraph from './components/JointAngleGraph';
 import FileOperationsPanel from './components/panels/FileOperationsPanel';
 import PropertiesPanel from './components/panels/PropertiesPanel';
 import AnimationPanel from './components/panels/AnimationPanel';
@@ -34,6 +35,7 @@ const App: React.FC = () => {
     const [currentTime, setCurrentTime] = useState(0);
     const [guidePositions, setGuidePositions] = useState({ x: 5, y: 90 });
     const [videoOpacity, setVideoOpacity] = useState(0.5);
+    const [showJointGraph, setShowJointGraph] = useState(true);
 
     const {
         keyframes,
@@ -176,15 +178,19 @@ const App: React.FC = () => {
     };
 
     if (!width || !height) {
-        return <div>Loading...</div>;
+        return <div className="flex items-center justify-center h-screen bg-app-bg text-text-primary">Loading...</div>;
     }
 
     const canvasSize = Math.min(width * 0.9, height * 0.9, 800);
     const canvasWidth = canvasSize;
     const canvasHeight = canvasSize * 0.67;
+    
+    // Calculate the actual width available for the timeline
+    // This should be the full width of the main content area
+    const timelineWidth = width - 250; // Subtract sidebar width
 
     return (
-        <div className="App">
+        <div className="flex h-screen bg-app-bg">
             <Toaster />
             <Sidebar>
                 <Toolbar
@@ -205,41 +211,73 @@ const App: React.FC = () => {
                 </InspectorPanel>
             </Sidebar>
             <MainContent>
-                <Viewport>
-                    <PoseRenderer
-                        draggable={true}
-                        width={canvasSize}
-                        height={canvasSize * 0.67}
-                        pose={currentPose}
-                        onPoseChange={handleManualPoseChange}
-                        guidePositions={guidePositions}
-                        setGuidePositions={setGuidePositions}
-                        prevPose={prevKeyframePose}
-                        nextPose={nextKeyframePose}
-                        currentTime={currentTime}
-                        videoOpacity={videoOpacity}
-                    />
-                </Viewport>
-                <Timeline
-                    canvasWidth={canvasWidth}
-                    canvasHeight={canvasHeight}
-                >
-                    {/* @ts-expect-error Linter doesn't understand props passed via cloneElement */}
-                    <PlayheadDisplay
-                        keyframes={keyframes}
-                        selectedKeyframeId={selectedKeyframeId}
-                        onKeyframeSelect={handleSelectKeyframe}
-                        onAddKeyframe={addKeyframeAndAdjustTimeline}
-                        currentTime={currentTime}
-                        startTime={0}
-                        endTime={endTime}
-                        onScrub={handleScrub}
-                        onKeyframeTimeChange={handleKeyframeTimeChange}
-                        onPlay={handlePlay}
-                        isPlaying={isPlaying}
-                        setAnimationDuration={setAnimationDuration}
-                    />
-                </Timeline>
+                <div className="flex flex-col h-full">
+                    <div className="flex-1">
+                        <Viewport>
+                            <PoseRenderer
+                                draggable={true}
+                                width={canvasSize}
+                                height={canvasSize * 0.67}
+                                pose={currentPose}
+                                onPoseChange={handleManualPoseChange}
+                                guidePositions={guidePositions}
+                                setGuidePositions={setGuidePositions}
+                                prevPose={prevKeyframePose}
+                                nextPose={nextKeyframePose}
+                                currentTime={currentTime}
+                                videoOpacity={videoOpacity}
+                            />
+                        </Viewport>
+                    </div>
+                    <div className="flex-shrink-0">
+                        <Timeline
+                            canvasWidth={canvasWidth}
+                            canvasHeight={canvasHeight}
+                            timelineWidth={timelineWidth}
+                        >
+                            {/* @ts-expect-error Linter doesn't understand props passed via cloneElement */}
+                            <PlayheadDisplay
+                                keyframes={keyframes}
+                                selectedKeyframeId={selectedKeyframeId}
+                                onKeyframeSelect={handleSelectKeyframe}
+                                onAddKeyframe={addKeyframeAndAdjustTimeline}
+                                currentTime={currentTime}
+                                startTime={0}
+                                endTime={endTime}
+                                onScrub={handleScrub}
+                                onKeyframeTimeChange={handleKeyframeTimeChange}
+                                onPlay={handlePlay}
+                                isPlaying={isPlaying}
+                                setAnimationDuration={setAnimationDuration}
+                            />
+                            {showJointGraph && (
+                                <JointAngleGraph
+                                    keyframes={keyframes}
+                                    currentTime={currentTime}
+                                    width={timelineWidth - 318} // Subtract space for controls (padding + gaps + buttons + time display + track constraints)
+                                    height={200}
+                                    selectedKeyframeId={selectedKeyframeId}
+                                    startTime={0}
+                                    endTime={endTime}
+                                />
+                            )}
+                        </Timeline>
+                    </div>
+                    <div className="flex-shrink-0 flex items-center justify-between bg-panel-bg border-t border-border-color px-2 py-1">
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setShowJointGraph(!showJointGraph)}
+                                className={`px-3 py-1 text-sm rounded border transition-colors ${
+                                    showJointGraph 
+                                        ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                                        : 'bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300'
+                                }`}
+                            >
+                                {showJointGraph ? 'Hide' : 'Show'} Joint Graph
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </MainContent>
         </div>
     );

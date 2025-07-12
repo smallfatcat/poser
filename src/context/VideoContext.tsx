@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 
 interface VideoContextType {
     videoFile: File | null;
@@ -36,6 +36,7 @@ export const VideoProvider: React.FC<VideoProviderProps> = ({ children }) => {
     const [videoDuration, setVideoDuration] = useState(0);
     const [currentVideoTime, setCurrentVideoTime] = useState(0);
     const videoRef = useRef<HTMLVideoElement | null>(null);
+    const timeUpdateThrottleRef = useRef<number>();
 
     const loadVideo = useCallback((file: File) => {
         // Clean up previous video URL
@@ -69,9 +70,15 @@ export const VideoProvider: React.FC<VideoProviderProps> = ({ children }) => {
             }
         });
 
+        // Throttled time update to reduce performance impact
         videoRef.current.addEventListener('timeupdate', () => {
+            if (videoRef.current && timeUpdateThrottleRef.current === undefined) {
+                timeUpdateThrottleRef.current = requestAnimationFrame(() => {
             if (videoRef.current) {
                 setCurrentVideoTime(videoRef.current.currentTime * 1000); // Convert to milliseconds
+                    }
+                    timeUpdateThrottleRef.current = undefined;
+                });
             }
         });
     }, [videoUrl]);
@@ -83,6 +90,10 @@ export const VideoProvider: React.FC<VideoProviderProps> = ({ children }) => {
         }
         if (videoUrl) {
             URL.revokeObjectURL(videoUrl);
+        }
+        if (timeUpdateThrottleRef.current) {
+            cancelAnimationFrame(timeUpdateThrottleRef.current);
+            timeUpdateThrottleRef.current = undefined;
         }
         setVideoFile(null);
         setVideoUrl(null);
@@ -122,10 +133,14 @@ export const VideoProvider: React.FC<VideoProviderProps> = ({ children }) => {
             if (videoUrl) {
                 URL.revokeObjectURL(videoUrl);
             }
+            if (timeUpdateThrottleRef.current) {
+                cancelAnimationFrame(timeUpdateThrottleRef.current);
+            }
         };
     }, [videoUrl]);
 
-    const value: VideoContextType = {
+    // Memoize the context value to prevent unnecessary re-renders
+    const value = useMemo<VideoContextType>(() => ({
         videoFile,
         videoUrl,
         videoElement: videoRef.current,
@@ -138,7 +153,19 @@ export const VideoProvider: React.FC<VideoProviderProps> = ({ children }) => {
         playVideo,
         pauseVideo,
         seekVideo,
-    };
+    }), [
+        videoFile,
+        videoUrl,
+        isVideoLoaded,
+        videoDuration,
+        currentVideoTime,
+        loadVideo,
+        clearVideo,
+        setVideoTime,
+        playVideo,
+        pauseVideo,
+        seekVideo,
+    ]);
 
     return (
         <VideoContext.Provider value={value}>

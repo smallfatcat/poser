@@ -28,36 +28,36 @@ const FileOperationsPanel: React.FC<FileOperationsPanelProps> = memo(({ onSave, 
     };
 
     return (
-        <div className="group">
-            <h3 className="group-title">File Operations</h3>
-            <div className="button-container">
-                <button onClick={onSave} className="btn btn-primary">
+        <div className="mb-5">
+            <h3 className="text-lg font-medium text-text-primary border-b border-border-color pb-2 mb-2.5">File Operations</h3>
+            <div className="flex flex-wrap gap-2 mb-4">
+                <button onClick={onSave} className="px-3 py-2 text-sm rounded border bg-accent-blue text-white border-accent-blue hover:bg-blue-600 transition-colors">
                     Save
                 </button>
-                <button onClick={handleLoadClick} className="btn">
+                <button onClick={handleLoadClick} className="px-3 py-2 text-sm rounded border bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300 transition-colors">
                     Load
                 </button>
                 <input
                     type="file"
                     ref={fileInputRef}
                     onChange={onLoad}
-                    style={{ display: 'none' }}
+                    className="hidden"
                     accept="application/json"
                 />
             </div>
             
-            <h3 className="group-title">Video Reference</h3>
-            <div className="button-container">
+            <h3 className="text-lg font-medium text-text-primary border-b border-border-color pb-2 mb-2.5">Video Reference</h3>
+            <div className="flex flex-wrap gap-2">
                 {!isVideoLoaded ? (
-                    <button onClick={handleLoadVideoClick} className="btn">
+                    <button onClick={handleLoadVideoClick} className="px-3 py-2 text-sm rounded border bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300 transition-colors">
                         Load Video
                     </button>
                 ) : (
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <span style={{ fontSize: '12px', color: '#666' }}>
+                    <div className="flex gap-2 items-center">
+                        <span className="text-xs text-gray-500">
                             {videoFile?.name}
                         </span>
-                        <button onClick={clearVideo} className="btn btn-small">
+                        <button onClick={clearVideo} className="px-2 py-1 text-xs rounded border bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300 transition-colors">
                             Clear
                         </button>
                     </div>
@@ -66,7 +66,7 @@ const FileOperationsPanel: React.FC<FileOperationsPanelProps> = memo(({ onSave, 
                     type="file"
                     ref={videoInputRef}
                     onChange={handleVideoLoad}
-                    style={{ display: 'none' }}
+                    className="hidden"
                     accept="video/*"
                 />
             </div>

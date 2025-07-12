@@ -29,50 +29,70 @@ const Toolbar: React.FC<ToolbarProps> = memo(({ currentPose, onPoseChange }) => 
     };
 
     return (
-        <div className="group">
-            <h3 className="group-title">Interaction Settings</h3>
-            <div className="button-container">
+        <div className="mb-5">
+            <h3 className="text-lg font-medium text-text-primary border-b border-border-color pb-2 mb-2.5">Interaction Settings</h3>
+            <div className="flex flex-wrap gap-2 mb-4">
                 <button
                     onClick={() => setDisableConstraints(!disableConstraints)}
-                    className={`btn ${disableConstraints ? 'active' : ''}`}
+                    className={`px-3 py-2 text-sm rounded border transition-colors ${
+                        disableConstraints 
+                            ? 'bg-accent-blue text-white border-accent-blue' 
+                            : 'bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300'
+                    }`}
                 >
                     {disableConstraints ? 'Constraints: Off' : 'Constraints: On'}
                 </button>
                 <button
                     onClick={() => setUseRelativeConstraints(!useRelativeConstraints)}
-                    className={`btn ${useRelativeConstraints ? 'active' : ''}`}
+                    className={`px-3 py-2 text-sm rounded border transition-colors ${
+                        useRelativeConstraints 
+                            ? 'bg-accent-blue text-white border-accent-blue' 
+                            : 'bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300'
+                    } ${disableConstraints ? 'opacity-50 cursor-not-allowed' : ''}`}
                     disabled={disableConstraints}
                 >
                     {useRelativeConstraints ? 'Constraints: Rel' : 'Constraints: Abs'}
                 </button>
                 <button
                     onClick={() => setUseInverseKinematics(!useInverseKinematics)}
-                    className={`btn ${useInverseKinematics ? 'active' : ''}`}
+                    className={`px-3 py-2 text-sm rounded border transition-colors ${
+                        useInverseKinematics 
+                            ? 'bg-accent-blue text-white border-accent-blue' 
+                            : 'bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300'
+                    } ${disableConstraints ? 'opacity-50 cursor-not-allowed' : ''}`}
                     disabled={disableConstraints}
                 >
                     {useInverseKinematics ? 'IK: On' : 'IK: Off'}
                 </button>
                 <button
                     onClick={toggleJointVisibility}
-                    className="btn"
+                    className="px-3 py-2 text-sm rounded border bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300 transition-colors"
                 >
                     {getJointVisibilityText()}
                 </button>
                 <button
                     onClick={() => setOnionSkinning(!onionSkinning)}
-                    className={`btn ${onionSkinning ? 'active' : ''}`}
+                    className={`px-3 py-2 text-sm rounded border transition-colors ${
+                        onionSkinning 
+                            ? 'bg-accent-blue text-white border-accent-blue' 
+                            : 'bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300'
+                    }`}
                 >
                     Onion Skin
                 </button>
                 <button
                     onClick={() => setLimbColoring(!limbColoring)}
-                    className={`btn ${limbColoring ? 'active' : ''}`}
+                    className={`px-3 py-2 text-sm rounded border transition-colors ${
+                        limbColoring 
+                            ? 'bg-accent-blue text-white border-accent-blue' 
+                            : 'bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300'
+                    }`}
                 >
                     {limbColoring ? 'Limb Colors: On' : 'Limb Colors: Off'}
                 </button>
             </div>
-            <div className="control-row">
-                <label htmlFor="scale-slider">
+            <div className="flex flex-col gap-1">
+                <label htmlFor="scale-slider" className="text-sm text-text-secondary">
                     Scale: {Math.round((currentPose.scale as number || 1) * 100)}%
                 </label>
                 <input
@@ -82,6 +102,7 @@ const Toolbar: React.FC<ToolbarProps> = memo(({ currentPose, onPoseChange }) => 
                     max="300"
                     value={Math.round((currentPose.scale as number || 1) * 100)}
                     onChange={handleScaleChange}
+                    className="w-full cursor-pointer"
                 />
             </div>
         </div>

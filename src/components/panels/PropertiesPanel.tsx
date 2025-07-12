@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import styles from './PropertiesPanel.module.css';
 import { Pose } from '../../types';
 
 interface BoneSliderProps {
@@ -36,8 +35,8 @@ const BoneSlider: React.FC<BoneSliderProps> = memo(({ name, value, onChange, min
     };
 
     return (
-        <div className={styles.sliderContainer}>
-            <label htmlFor={`${name}-length`} className={styles.sliderLabel}>
+        <div className="flex flex-col items-center w-36">
+            <label htmlFor={`${name}-length`} className="text-sm text-text-secondary mb-1 capitalize">
                 {getDisplayName(name)}
             </label>
             <input
@@ -48,9 +47,9 @@ const BoneSlider: React.FC<BoneSliderProps> = memo(({ name, value, onChange, min
                 max={max}
                 value={value}
                 onChange={(e) => onChange(name, parseInt(e.target.value, 10))}
-                className={styles.sliderInput}
+                className="w-full cursor-pointer"
             />
-            <span className={styles.sliderValue}>
+            <span className="text-sm font-bold text-white mt-1">
                 {name === 'scale' ? `${value}%` : value}
             </span>
         </div>
@@ -64,40 +63,40 @@ interface PropertiesPanelProps {
 
 const PropertiesPanel: React.FC<PropertiesPanelProps> = memo(({ boneLengths, onBoneLengthChange }) => {
     return (
-        <div className={styles.group}>
-            <h3 className={styles.groupTitle}>Center Bones</h3>
-            <div className={styles.slidersContainer}>
+        <div className="mb-5">
+            <h3 className="text-base text-text-primary border-b border-border-color pb-2 mb-2.5">Center Bones</h3>
+            <div className="flex flex-wrap gap-4 justify-center mb-4">
                 <BoneSlider name="torsoLength" value={boneLengths.torsoLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="neckLength" value={boneLengths.neckLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="headRadius" value={boneLengths.headRadius as number} onChange={onBoneLengthChange} min={5} max={50} />
             </div>
             
-            <h3 className={styles.groupTitle}>Left Arm</h3>
-            <div className={styles.slidersContainer}>
+            <h3 className="text-base text-text-primary border-b border-border-color pb-2 mb-2.5">Left Arm</h3>
+            <div className="flex flex-wrap gap-4 justify-center mb-4">
                 <BoneSlider name="leftShoulderLength" value={boneLengths.leftShoulderLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftUpperArmLength" value={boneLengths.leftUpperArmLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftLowerArmLength" value={boneLengths.leftLowerArmLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftHandLength" value={boneLengths.leftHandLength as number} onChange={onBoneLengthChange} />
             </div>
             
-            <h3 className={styles.groupTitle}>Right Arm</h3>
-            <div className={styles.slidersContainer}>
+            <h3 className="text-base text-text-primary border-b border-border-color pb-2 mb-2.5">Right Arm</h3>
+            <div className="flex flex-wrap gap-4 justify-center mb-4">
                 <BoneSlider name="rightShoulderLength" value={boneLengths.rightShoulderLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightUpperArmLength" value={boneLengths.rightUpperArmLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightLowerArmLength" value={boneLengths.rightLowerArmLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightHandLength" value={boneLengths.rightHandLength as number} onChange={onBoneLengthChange} />
             </div>
             
-            <h3 className={styles.groupTitle}>Left Leg</h3>
-            <div className={styles.slidersContainer}>
+            <h3 className="text-base text-text-primary border-b border-border-color pb-2 mb-2.5">Left Leg</h3>
+            <div className="flex flex-wrap gap-4 justify-center mb-4">
                 <BoneSlider name="leftHipLength" value={boneLengths.leftHipLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftUpperLegLength" value={boneLengths.leftUpperLegLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftLowerLegLength" value={boneLengths.leftLowerLegLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="leftFootLength" value={boneLengths.leftFootLength as number} onChange={onBoneLengthChange} />
             </div>
             
-            <h3 className={styles.groupTitle}>Right Leg</h3>
-            <div className={styles.slidersContainer}>
+            <h3 className="text-base text-text-primary border-b border-border-color pb-2 mb-2.5">Right Leg</h3>
+            <div className="flex flex-wrap gap-4 justify-center mb-4">
                 <BoneSlider name="rightHipLength" value={boneLengths.rightHipLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightUpperLegLength" value={boneLengths.rightUpperLegLength as number} onChange={onBoneLengthChange} />
                 <BoneSlider name="rightLowerLegLength" value={boneLengths.rightLowerLegLength as number} onChange={onBoneLengthChange} />

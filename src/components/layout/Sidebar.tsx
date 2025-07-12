@@ -6,7 +6,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ children }) => {
     return (
-        <div className="sidebar">
+        <div className="w-sidebar border-r border-gray-300 p-2.5 flex flex-col gap-2.5 bg-panel-bg">
             {children}
         </div>
     );

@@ -6,7 +6,7 @@ interface ViewportProps {
 
 const Viewport: React.FC<ViewportProps> = ({ children }) => {
     return (
-        <div className="viewport">
+        <div className="flex-1 flex items-center justify-center bg-panel-bg rounded border border-border-color">
             {children}
         </div>
     );

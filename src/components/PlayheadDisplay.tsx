@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import styles from './PlayheadDisplay.module.css';
+import './PlayheadDisplay.css';
 import { Pose } from '../types';
 import KeyframeThumbnail from './KeyframeThumbnail';
 import { useSettings } from '../context/SettingsContext';
@@ -77,7 +77,7 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
               onChange={handleInputChange}
               onBlur={(e) => e.target.value = displayValue.toString()}
               step={timeDisplayMode === 'seconds' ? 0.01 : 1}
-              className={styles.timeInput}
+              className="timeInput"
           />
       );
   };
@@ -161,10 +161,10 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
 }, [draggedKeyframeId, onKeyframeTimeChange, startTime, duration]);
 
   return (
-    <div className={styles.playheadContainer}>
-        <div className={styles.track} onClick={handleTrackClick} ref={trackRef}>
+    <div className="w-full p-2.5 bg-panel-bg rounded-xl shadow-lg flex items-center gap-5">
+        <div className="flex-grow h-2 bg-gray-600 relative rounded cursor-pointer" onClick={handleTrackClick} ref={trackRef}>
             <div
-            className={styles.playhead}
+            className="playhead"
             style={{ left: `${playheadPosition}%` }}
             onMouseDown={handlePlayheadMouseDown}
             />
@@ -173,7 +173,7 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
             return (
                 <div
                 key={keyframe.id}
-                className={styles.keyframeContainer}
+                className="absolute top-1/2 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer w-5 h-5 flex justify-center items-center keyframeContainer"
                 style={{ left: `${keyframePosition}%` }}
                 onMouseDown={(e) => handleKeyframeMouseDown(e, keyframe.id)}
                 onClick={(e) => {
@@ -182,10 +182,10 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
                     onScrub(keyframe.time);
                 }}
                 >
-                    <div className={`${styles.keyframe} ${
-                        keyframe.id === selectedKeyframeId ? styles.selected : ''
+                    <div className={`keyframe ${
+                        keyframe.id === selectedKeyframeId ? 'selected' : ''
                     }`} />
-                    <div className={styles.thumbnail}>
+                    <div className="thumbnail">
                         <KeyframeThumbnail
                             pose={keyframe.pose}
                             size={80}
@@ -194,7 +194,7 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
                             canvasWidth={canvasWidth}
                             canvasHeight={canvasHeight}
                         />
-                        <div className={styles.thumbnailTime}>
+                        <div className="bg-black bg-opacity-60 text-white text-center py-1 text-xs font-bold rounded-b w-full">
                             {timeDisplayMode === 'seconds'
                                 ? `${(keyframe.time / 1000).toFixed(2)}s`
                                 : `${Math.round(keyframe.time / (1000 / 60))}f`}
@@ -204,19 +204,19 @@ const PlayheadDisplay: React.FC<PlayheadDisplayProps> = ({
             );
             })}
         </div>
-        <div className={styles.buttonGroup}>
+        <div className="flex gap-0">
             <button
                 onClick={onAddKeyframe}
-                className="btn btn-icon"
+                className="px-3 py-2 text-sm rounded border bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300 transition-colors"
             >+</button>
             <button
                 onClick={onPlay}
-                className="btn btn-icon"
+                className="px-3 py-2 text-sm rounded border bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300 transition-colors"
             >
                 {isPlaying ? '❚❚' : '▶'}
             </button>
         </div>
-        <div className={styles.timeDisplay}>
+        <div className="bg-gray-800 text-white p-2 rounded font-mono text-sm min-w-20 text-center ml-2.5">
             {renderTimeInput(currentTime, handleTimeChange)}
             <span>/</span>
             {renderTimeInput(duration, handleDurationChange)}
